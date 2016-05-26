@@ -1,4 +1,15 @@
+app_root = File.dirname(File.absolute_path(__FILE__))
+Dir.glob("#{app_root}/../app/controllers/**/*_controller.rb", &method(:require))
+
 Rails.application.routes.draw do
+  def api_version(version, &routes)
+    api_constraint = ApiConstraint.new(version: version)
+    scope(module: "v#{version}", constraints: api_constraint, &routes)
+  end
+
+  api_version(1) do
+    resources :checkins
+  end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -12,7 +23,7 @@ Rails.application.routes.draw do
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
-    resources :checkins
+    # resources :checkins
 
   # Example resource route with options:
   #   resources :products do
