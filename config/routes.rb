@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   def api_version(version, &routes)
     api_constraint = ApiConstraint.new(version: version)
     scope(module: "v#{version}", constraints: api_constraint, &routes)
+
+    # cutely define the "no version" resource as the last one defined
+    # (assuming the last defined is the greatest version #)
+    scope(module: "v#{version}", &routes)
   end
 
   api_version(1) do
