@@ -7,7 +7,7 @@ default: &default
 development:
   <<: *default
   database: wp_sprtid
-  username: sprtidco_admin
+  username: sprtid_api
   password: sprtid1234
   host: localhost
   port: 8889
@@ -18,8 +18,18 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: db/test.mysql
+  database: wp_sprtid_test
+  username: sprtid_api_test
+  password: sprtid1234
+  host: localhost
+  port: 8889
+  socket: /Applications/MAMP/tmp/mysql/mysql.sock
 
 production:
   <<: *default
-  database: db/production.mysql
+  database: <%= ENV['DATABASE_NAME'] %>
+  username: <%= ENV['DATABASE_USER'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] %>
+  port: <%= ENV['DATABASE_PORT'] %>
+  socket: <%= ENV['DATABASE_SOCKET'] %>
