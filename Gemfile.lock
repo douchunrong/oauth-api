@@ -44,6 +44,8 @@ GEM
     coderay (1.1.1)
     concurrent-ruby (1.0.2)
     debug_inspector (0.0.2)
+    doorkeeper (3.1.0)
+      railties (>= 3.2)
     erubis (2.7.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
@@ -102,6 +104,8 @@ GEM
     rake (11.1.2)
     rdoc (4.2.2)
       json (~> 1.4)
+    responders (2.2.0)
+      railties (>= 4.2.0, < 5.1)
     ruby-wpdb (1.2.3)
       mysql2 (~> 0.3)
       php-serialize (~> 1.1)
@@ -139,9 +143,11 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
+  doorkeeper
   jbuilder (~> 2.0)
   mysql
   rails (= 4.2.6)
+  responders (~> 2.0)
   ruby-wpdb
   sdoc (~> 0.4.0)
   spring

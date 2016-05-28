@@ -3,6 +3,8 @@ source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
+gem 'responders', '~> 2.0'
+
 # Use sqlite3 as the database for Active Record
 gem 'mysql'
 # Use SCSS for stylesheets
@@ -15,6 +17,9 @@ gem 'mysql'
 # gem 'therubyracer', platforms: :ruby
 
 gem 'ruby-wpdb'
+
+# Oauth2 Provider
+gem 'doorkeeper'
 
 # Use jquery as the JavaScript library
 # gem 'jquery-rails'

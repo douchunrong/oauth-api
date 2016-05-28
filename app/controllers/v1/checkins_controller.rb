@@ -2,6 +2,8 @@ require_relative '../../models/v1/checkin'
 
 module V1
   class CheckinsController < ApplicationController
+    respond_to :json
+
     def index
       [405, 'Not Implemented']
     end

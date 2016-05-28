@@ -1,5 +1,7 @@
 require_relative 'pods_model'
 
-class Event < PodsModel
-  pods_type('sprtid_event')
+module V1
+  class Event < PodsModel
+    pods_type('sprtid_event')
+  end
 end

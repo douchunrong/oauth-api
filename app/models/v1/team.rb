@@ -1,5 +1,7 @@
 require_relative 'pods_model'
 
-class Team < PodsModel
-  pods_type('sprtid_team')
+module V1
+  class Team < PodsModel
+    pods_type('sprtid_team')
+  end
 end

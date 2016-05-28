@@ -7,7 +7,8 @@ default: &default
 development:
   <<: *default
   database: wp_sprtid
-  username: sprtid_api
+  # username: sprtid_api
+  username: sprtidco_admin
   password: sprtid1234
   host: localhost
   port: 8889
