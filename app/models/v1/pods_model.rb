@@ -1,6 +1,7 @@
 require 'ruby-wpdb'
 
 require_relative 'active_record_sequel_adapter'
+require_relative 'data_exposure_methods'
 
 # ******* 'I have no idea what Im doing' *******
 # I want this to live somewhere else, but it's super fickle.  The class
@@ -22,12 +23,9 @@ WPDB.init(database_uri)
 module V1
   class PodsModel < WPDB::Post
     include ActiveRecordSequelAdapter
+    include DataExposureMethods
 
-    dataset_module do
-      def active
-        filter(post_type: model.post_type)
-      end
-    end
+    attr_accessor :meta_lookup
 
     def after_initialize
       self.meta_lookup = Hash[
@@ -35,41 +33,18 @@ module V1
       ]
     end
 
-    plugin :after_initialize
+    plugin(:after_initialize)
 
-    def as_json(options = {})
-      options = options.try(:clone) || {}
-
-      (options[:except] ||= []).concat self.class.internals
-      (options[:methods] ||= []).concat self.class.fields
-
-      # (see comment below) the delegate has String keys, therefore, internal.to_s
-      options[:except].map!(&:to_s)
-
-      # at some point in the inheritance tree, there is a simple delegator,
-      # which delegates to a hash.  Instead of calling as_json with the options
-      # on that hash, it simply returns the hash.
-      # on that note, *we* call as_json on that hash, but then have to apply
-      # methods manually, since we want the methods sent to this instance, not
-      # the underlying hash
-      super
-        .as_json(options)
-        .tap do |hash|
-          options[:methods].each { |f| hash[f] = send(f) }
-        end
+    dataset_module do
+      def active
+        filter(post_type: model.post_type)
+      end
     end
-
-    private
-
-    attr_accessor :meta_lookup
-    cattr_accessor :fields, :internals
 
     class << self
       attr_reader :post_type
 
       protected
-
-      attr_writer :post_type
 
       def pods_type(type)
         self.post_type = type
@@ -79,31 +54,9 @@ module V1
         set_dataset(active)
       end
 
-      def ignore(*internals)
-        (self.internals ||= []).concat internals
-      end
+      private
 
-      def alias_method(accessor, internal)
-        (self.internals ||= []) << internal.to_s
-        (self.fields ||= []) << accessor
-
-        super
-      end
-
-      def field(accessor, meta_key = nil)
-        (self.fields ||= []) << accessor
-        meta_key ||= accessor
-
-        class_eval %Q{
-          def #{ accessor }
-            meta_lookup[:#{ meta_key }].try(:meta_value)
-          end
-
-          def #{ accessor }=(val)
-            meta_lookup[:#{ meta_key }].try(:meta_value=, val)
-          end
-        }
-      end
+      attr_writer :post_type
     end
 
     alias_method :createdBy, :post_author

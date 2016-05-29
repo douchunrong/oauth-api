@@ -16,7 +16,9 @@ gem 'mysql'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
+# WordPress Migration
 gem 'ruby-wpdb'
+gem 'phpass-ruby'
 
 # Oauth2 Provider
 gem 'doorkeeper'

@@ -2,6 +2,7 @@ app_root = File.dirname(File.absolute_path(__FILE__))
 Dir.glob("#{app_root}/../app/controllers/**/*_controller.rb", &method(:require))
 
 Rails.application.routes.draw do
+  use_doorkeeper
   def api_version(version, &routes)
     api_constraint = ApiConstraint.new(version: version)
     scope(module: "v#{version}", constraints: api_constraint, &routes)

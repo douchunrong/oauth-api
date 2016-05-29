@@ -70,6 +70,7 @@ GEM
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     php-serialize (1.1.0)
+    phpass-ruby (0.1.2)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -146,6 +147,7 @@ DEPENDENCIES
   doorkeeper
   jbuilder (~> 2.0)
   mysql
+  phpass-ruby
   rails (= 4.2.6)
   responders (~> 2.0)
   ruby-wpdb
