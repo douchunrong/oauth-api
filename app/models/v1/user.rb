@@ -2,7 +2,6 @@ require 'phpass'
 
 require_relative 'active_record_sequel_adapter'
 require_relative 'data_exposure_methods'
-require_relative 'meta_lookup_methods'
 
 module V1
   class User < WPDB::User
@@ -29,8 +28,16 @@ module V1
     field :first_name
     field :last_name
 
-    def check_password(plaintext_password)
-      Phpass.new(8).check(plaintext_password, user_pass)
+    # validates :email, presence: true
+
+    def authenticate(password)
+      Phpass.new(8).check(password, user_pass)
+    end
+
+    class << self
+      def find_by_email(email)
+        where(user_email: email).limit(1).first
+      end
     end
   end
 end

@@ -1,4 +1,5 @@
 require_relative '../../models/v1/checkin'
+require_relative 'application_controller'
 
 module V1
   class CheckinsController < ApplicationController

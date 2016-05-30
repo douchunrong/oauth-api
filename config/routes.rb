@@ -14,7 +14,14 @@ Rails.application.routes.draw do
 
   api_version(1) do
     resources :checkins
+
+    resources :users, only: [:new, :create]
+
+    resources :sessions, only: [:new, :create]
+    # delete '/logout', to: 'sessions#destroy', as: :session_logout
   end
+
+  root to: 'pages#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
