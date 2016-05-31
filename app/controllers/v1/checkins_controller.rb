@@ -5,20 +5,22 @@ module V1
   class CheckinsController < ApplicationController
     respond_to :json
 
+    before_action :doorkeeper_authorize!
+
     def index
-      [405, 'Not Implemented']
+      render(json: current_user.checkins)
     end
 
     def create
-      [405, 'Not Implemented']
+      halt(405, 'Not Implemented')
     end
 
     def new
-      [405, 'Not Implemented']
+      halt(405, 'Not Implemented')
     end
 
     def edit
-      [405, 'Not Implemented']
+      halt(405, 'Not Implemented')
     end
 
     def show
@@ -28,11 +30,11 @@ module V1
     end
 
     def update
-      [405, 'Not Implemented']
+      halt(405, 'Not Implemented')
     end
 
     def destroy
-      [405, 'Not Implemented']
+      halt(405, 'Not Implemented')
     end
   end
 end

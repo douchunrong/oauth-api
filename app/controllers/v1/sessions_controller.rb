@@ -1,5 +1,5 @@
 require_relative '../../models/v1/user'
-require_relative 'application_controller'
+require_relative '../application_controller'
 
 module V1
   class SessionsController < ApplicationController

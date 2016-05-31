@@ -23,7 +23,6 @@ WPDB.init(database_uri)
 module V1
   class PodsModel < WPDB::Post
     include ActiveRecordSequelAdapter
-    include DataExposureMethods
 
     attr_accessor :meta_lookup
 
@@ -57,32 +56,34 @@ module V1
       private
 
       attr_writer :post_type
+
+      def initialize_common_pods_methods!
+        alias_method :createdById, :post_author
+        alias_method :createdAt, :post_date
+        alias_method :id, :ID
+        alias_method :modifiedAt, :post_modified
+        alias_method :name, :post_name
+        alias_method :parent, :post_parent
+        alias_method :status, :post_status
+        alias_method :title, :post_title
+
+        ignore \
+          :comment_count,
+          :comment_status,
+          :guid,
+          :menu_order,
+          :ping_status,
+          :pinged,
+          :post_content,
+          :post_content_filtered,
+          :post_date_gmt,
+          :post_excerpt,
+          :post_mime_type,
+          :post_modified_gmt,
+          :post_password,
+          :post_type,
+          :to_ping
+      end
     end
-
-    alias_method :createdBy, :post_author
-    alias_method :createdAt, :post_date
-    alias_method :id, :ID
-    alias_method :modifiedAt, :post_modified
-    alias_method :name, :post_name
-    alias_method :parent, :post_parent
-    alias_method :status, :post_status
-    alias_method :title, :post_title
-
-    ignore \
-      :comment_count,
-      :comment_status,
-      :guid,
-      :menu_order,
-      :ping_status,
-      :pinged,
-      :post_content,
-      :post_content_filtered,
-      :post_date_gmt,
-      :post_excerpt,
-      :post_mime_type,
-      :post_modified_gmt,
-      :post_password,
-      :post_type,
-      :to_ping
   end
 end

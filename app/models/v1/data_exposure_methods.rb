@@ -28,6 +28,10 @@ module V1
         end
     end
 
+    def meta_value(key)
+      meta_lookup[key].try(:meta_value)
+    end
+
     module ClassMethods
       def ignore(*internals)
         (self.internals ||= []).concat internals
@@ -46,7 +50,7 @@ module V1
 
         class_eval %Q{
           def #{ accessor }
-            meta_lookup[:#{ meta_key }].try(:meta_value)
+            meta_value(:#{ meta_key })
           end
 
           def #{ accessor }=(val)

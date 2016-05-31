@@ -2,6 +2,7 @@ require 'phpass'
 
 require_relative 'active_record_sequel_adapter'
 require_relative 'data_exposure_methods'
+require_relative 'checkin'
 
 module V1
   class User < WPDB::User
@@ -9,6 +10,8 @@ module V1
     include DataExposureMethods
 
     attr_accessor :meta_lookup
+
+    # initialize_common_pods_methods!
 
     def after_initialize
       self.meta_lookup = Hash[
@@ -27,6 +30,20 @@ module V1
 
     field :first_name
     field :last_name
+
+    one_to_many :checkins_initialized, {
+      key: :post_author,
+      primary_key: :ID,
+      class: 'V1::Checkin'
+    }
+
+    # one_to_many :checkins, {
+    #   key: :checked_in_by,
+    #   class: :'V1::Checkin'
+    # }
+    def checkins
+      checkins_initialized
+    end
 
     # validates :email, presence: true
 

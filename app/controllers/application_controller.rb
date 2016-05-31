@@ -5,8 +5,9 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # @todo: sort this out once there's a V2
   def current_user
-    raise NotImplementedError
+    @current_user ||= V1::User.find(session[:user_id]) if session[:user_id]
   end
 
   helper_method :current_user

@@ -18,8 +18,9 @@ Rails.application.routes.draw do
     resources :users, only: [:new, :create]
 
     resources :sessions, only: [:new, :create]
-    # delete '/logout', to: 'sessions#destroy', as: :session_logout
   end
+
+  delete '/logout', to: 'sessions#destroy', as: :logout
 
   root to: 'pages#index'
   # The priority is based upon order of creation: first created -> highest priority.

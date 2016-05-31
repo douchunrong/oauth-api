@@ -3,6 +3,8 @@ require_relative 'application_controller'
 
 module V1
   class UsersController < ApplicationController
+    before_action :doorkeeper_authorize!
+
     def new
       @user = User.new
     end

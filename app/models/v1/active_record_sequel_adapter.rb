@@ -5,6 +5,7 @@ module V1
     end
 
     module ClassMethods
+      # id may be an array
       def find(id)
         queryable_for_find(id).first
       end
