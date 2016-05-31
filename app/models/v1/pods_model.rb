@@ -58,14 +58,14 @@ module V1
       attr_writer :post_type
 
       def initialize_common_pods_methods!
-        alias_method :createdById, :post_author
-        alias_method :createdAt, :post_date
-        alias_method :id, :ID
-        alias_method :modifiedAt, :post_modified
-        alias_method :name, :post_name
-        alias_method :parent, :post_parent
-        alias_method :status, :post_status
-        alias_method :title, :post_title
+        field :createdById, :post_author
+        field :createdAt, :post_date, type: DateTime
+        field :id, :ID
+        field :modifiedAt, :post_modified, type: DateTime
+        field :name, :post_name
+        field :parent, :post_parent
+        field :status, :post_status
+        field :title, :post_title
 
         ignore \
           :comment_count,

@@ -20,15 +20,20 @@ module V1
 
     plugin :after_initialize
 
-    alias_method :created_at, :user_registered
-    alias_method :email, :user_email
-    alias_method :id, :ID
-    alias_method :login, :user_login
+    field :created_at, :user_registered
+    field :email, :user_email
+    field :id, :ID
+    field :login, :user_login
 
+    ignore :display_name
+    ignore :user_activation_key
+    ignore :user_nicename
     ignore :user_pass
+    ignore :user_status
+    ignore :user_url
 
-    field :first_name
-    field :last_name
+    metafield :first_name
+    metafield :last_name
 
     one_to_many :checkins_created, {
       key: :post_author,

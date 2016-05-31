@@ -1,8 +1,8 @@
-require_relative '../../models/v1/event'
+require_relative '../../models/v1/team'
 require_relative 'application_controller'
 
 module V1
-  class EventsController < ApplicationController
+  class TeamsController < ApplicationController
     respond_to :json
 
     before_action :doorkeeper_authorize!
@@ -11,9 +11,9 @@ module V1
       title = params[:filters].try(:[], :title)
 
       resources = if current_user.admin?
-        Event.filter_by_title(title).all
+        Team.filter_by_title(title).all
       else
-        Event.accessible_to(current_user, title)
+        Team.accessible_to(current_user, title)
       end
 
       render(json: resources)
@@ -24,7 +24,7 @@ module V1
     end
 
     def show
-      resource = Event.find(params[:id])
+      resource = Team.find(params[:id])
 
       render(json: resource.as_json)
     end

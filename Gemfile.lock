@@ -82,6 +82,7 @@ GEM
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     php-serialize (1.1.0)
+    php_serialize (1.2)
     phpass-ruby (0.1.2)
     pry (0.10.3)
       coderay (~> 1.1.0)
@@ -164,6 +165,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   mysql
+  php_serialize
   phpass-ruby
   pry-rails
   rails (= 4.2.6)

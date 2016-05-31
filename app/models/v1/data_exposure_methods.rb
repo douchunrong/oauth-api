@@ -28,8 +28,20 @@ module V1
         end
     end
 
-    def meta_value(key)
-      meta_lookup[key].try(:meta_value)
+    def typed_value(value, type)
+      return value unless type.respond_to?(:==)
+      return value unless value.is_a?(String)
+
+      case
+      when type == DateTime
+        DateTime.parse(value)
+      else
+        value
+      end
+    end
+
+    def meta_value(key, type = nil)
+      typed_value(meta_lookup[key].try(:meta_value), type)
     end
 
     module ClassMethods
@@ -37,20 +49,29 @@ module V1
         (self.internals ||= []).concat internals
       end
 
-      def alias_method(accessor, internal)
+      def field(accessor, internal, options = {})
         (self.internals ||= []) << internal.to_s
         (self.fields ||= []) << accessor
 
-        super
+        # self.alias_method(accessor, internal)
+        class_eval %Q{
+          def #{ accessor }
+            typed_value(values[:#{ internal }], #{ options[:type].try(:name) || 'nil' })
+          end
+
+          def #{ accessor }=(val)
+            values[:#{ internal }] = val
+          end
+        }
       end
 
-      def field(accessor, meta_key = nil)
+      def metafield(accessor, meta_key = nil, options = {})
         (self.fields ||= []) << accessor
         meta_key ||= accessor
 
         class_eval %Q{
           def #{ accessor }
-            meta_value(:#{ meta_key })
+            meta_value(:#{ meta_key }, #{ options[:type].try(:name) || 'nil' })
           end
 
           def #{ accessor }=(val)

@@ -11,9 +11,9 @@ module V1
 
     initialize_common_pods_methods!
 
-    field :signature
-    field :profile_id, :profile
-    field :event_id, :event
+    metafield :signature
+    metafield :profile_id, :profile
+    metafield :event_id, :event
 
     many_to_one :created_by, {
       key: :post_author,

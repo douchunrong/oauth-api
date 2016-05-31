@@ -1,9 +1,9 @@
 require_relative 'pods_model'
 require_relative 'checkin'
+require_relative 'image'
+require_relative 'location'
 
 module V1
-  # @todo: Find a proper address model
-  Address = Struct.new(:street, :unit, :city, :state, :zip)
   Insurance = Struct.new(:company, :type, :phone, :group_number, :member_number)
 
   class Profile < PodsModel
@@ -13,30 +13,30 @@ module V1
 
     initialize_common_pods_methods!
 
-    field :first_name
-    field :middle_initial
-    field :last_name
-    field :birth_date
-    field :sprtid_code
-    field :email
-    field :phone
-    field :gender
+    metafield :first_name
+    metafield :middle_initial
+    metafield :last_name
+    metafield :birth_date
+    metafield :sprtid_code
+    metafield :email
+    metafield :phone
+    metafield :gender
 
-    field :insurance # hacking this into fields, even though method is below
+    metafield :insurance # hacking this into fields, even though method is below
 
     # @todo: idk... do something with this
-    field :school
-    field :graduation_year
+    metafield :school
+    metafield :graduation_year
 
-    field :medical_history
+    metafield :medical_history
 
-    field :current_medication
-    field :current_injury_or_illness
+    metafield :current_medication
+    metafield :current_injury_or_illness
 
-    field :height
-    field :weight
-    field :profile_type
-    field :allergies # Array
+    metafield :height
+    metafield :weight
+    metafield :profile_type
+    metafield :allergies # Array
 
     # many_to_many :guardians, {
     #   key: :guardian_ID,
@@ -50,13 +50,15 @@ module V1
 
     one_to_one :profile_photo, {
       key: :ID,
-      primary_key: :profile_photo_attachment_id
+      primary_key: :profile_photo_attachment_id,
+      class: 'V1::Image'
     }
 
     # @todo: many_to_one
     one_to_one :birth_date_proof, {
       key: :ID,
-      primary_key: :birth_date_proof_attachment_id
+      primary_key: :birth_date_proof_attachment_id,
+      class: 'V1::Image'
     }
     alias _birth_date_proof birth_date_proof
 
@@ -66,7 +68,8 @@ module V1
 
     one_to_one :cover_image, {
       key: :ID,
-      primary_key: :cover_image_attachment_id
+      primary_key: :cover_image_attachment_id,
+      class: 'V1::Image'
     }
 
     def allergies
@@ -76,13 +79,17 @@ module V1
     end
 
     def addresses
-      [Address.new(
-        meta_value(:street_address),
-        meta_value(:unit),
-        meta_value(:city),
-        meta_value(:state),
-        meta_value(:zip)
-      )]
+      [
+        Location.from_address(
+          Address.new(
+            meta_value(:street_address),
+            meta_value(:unit),
+            meta_value(:city),
+            meta_value(:state),
+            meta_value(:zip)
+          )
+        )
+      ]
     end
 
     def insurance

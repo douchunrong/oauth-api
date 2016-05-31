@@ -19,6 +19,7 @@ gem 'mysql'
 # WordPress Migration
 gem 'ruby-wpdb'
 gem 'phpass-ruby'
+gem 'php_serialize'
 
 # Oauth2 Provider
 gem 'doorkeeper'
