@@ -1,18 +1,22 @@
-require_relative '../../models/v1/checkin'
+require_relative '../../models/v1/event'
 require_relative 'application_controller'
 
 module V1
-  # @todo: should this even be a controller?
-  #        should it rather be a subcontroller of profile and event?
-  class CheckinsController < ApplicationController
+  class EventsController < ApplicationController
     respond_to :json
 
     before_action :doorkeeper_authorize!
 
     def index
-      checkins = Checkin.accessible_to(current_user)
+      title = params[:filters].try(:[], :title)
 
-      render(json: checkins)
+      events = if current_user.admin?
+        Event.filter_by_title(title).all
+      else
+        Event.accessible_to(current_user, title)
+      end
+
+      render(json: events)
     end
 
     def create
@@ -20,7 +24,7 @@ module V1
     end
 
     def show
-      resource = Checkin.find(params[:id])
+      resource = Event.find(params[:id])
 
       render(json: resource.as_json)
     end

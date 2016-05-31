@@ -15,7 +15,7 @@ module V1
     field :profile_id, :profile
     field :event_id, :event
 
-    many_to_one :initialized_by, {
+    many_to_one :created_by, {
       key: :post_author,
       primary_key: :ID,
       class: 'V1::User'
@@ -23,9 +23,9 @@ module V1
 
     def checked_in_by
       # in future versions, I expect this to always be the parent, whereas
-      # initialized_by could be a coach "checking his/her whole team in"
+      # initialized_by could be a coach "checks his/her whole team in"
       # (quotes, because a parent will always have to fill out the form)
-      initialized_by
+      created_by
     end
 
     def profile
@@ -42,6 +42,13 @@ module V1
       (options[:methods] ||= []) << :profile << :event
 
       super(options)
+    end
+
+    class << self
+      def accessible_to(user, filter = nil)
+        # all checkins for this user, this user's profiles, etc
+        user.checkins
+      end
     end
   end
 end

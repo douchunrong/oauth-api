@@ -3,6 +3,7 @@ require 'phpass'
 require_relative 'active_record_sequel_adapter'
 require_relative 'data_exposure_methods'
 require_relative 'checkin'
+require_relative 'event'
 
 module V1
   class User < WPDB::User
@@ -10,8 +11,6 @@ module V1
     include DataExposureMethods
 
     attr_accessor :meta_lookup
-
-    # initialize_common_pods_methods!
 
     def after_initialize
       self.meta_lookup = Hash[
@@ -31,7 +30,7 @@ module V1
     field :first_name
     field :last_name
 
-    one_to_many :checkins_initialized, {
+    one_to_many :checkins_created, {
       key: :post_author,
       primary_key: :ID,
       class: 'V1::Checkin'
@@ -42,7 +41,26 @@ module V1
     #   class: :'V1::Checkin'
     # }
     def checkins
-      checkins_initialized
+      checkins_created
+    end
+
+    one_to_many :events_created, {
+      key: :post_author,
+      primary_key: :ID,
+      class: 'V1::Event'
+    }
+
+    # one_to_many :events, {
+    #   ...
+    #   class: :'V1::Event'
+    # }
+    def events
+      events_created
+    end
+
+    ADMIN_USER_LEVEL = '10'.freeze
+    def admin?
+      meta_lookup[:wp_user_level].try(:meta_value) == ADMIN_USER_LEVEL
     end
 
     # validates :email, presence: true

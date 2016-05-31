@@ -58,7 +58,7 @@ module V1
       key: :ID,
       primary_key: :birth_date_proof_attachment_id
     }
-    alias :_birth_date_proof :birth_date_proof
+    alias _birth_date_proof birth_date_proof
 
     def birth_date_proof
       [_birth_date_proof]

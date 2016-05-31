@@ -12,8 +12,10 @@ Rails.application.routes.draw do
     scope(module: "v#{version}", &routes)
   end
 
+  RESOURCE_ROUTES = %i(index create show update destroy)
   api_version(1) do
-    resources :checkins
+    resources :checkins, only: RESOURCE_ROUTES
+    resources :events, only: RESOURCE_ROUTES
 
     resources :users, only: [:new, :create]
 
