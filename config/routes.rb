@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   api_version(1) do
     resources :checkins, only: RESOURCE_ROUTES
     resources :events, only: RESOURCE_ROUTES
+    resources :profiles, only: RESOURCE_ROUTES
+    resources :sports, only: RESOURCE_ROUTES
     resources :teams, only: RESOURCE_ROUTES
 
     resources :users, only: [:new, :create]
