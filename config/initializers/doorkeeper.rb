@@ -4,7 +4,7 @@ Doorkeeper.configure do
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    V1::User.find(session[:user_id]) || # V2::User.find(session[:user_id]) ||
+    Models::V1::User.find(session[:user_id]) || # Models::V1::User.find(session[:user_id]) ||
       redirect_to(new_session_url)
   end
 

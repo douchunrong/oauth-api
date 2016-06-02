@@ -1,6 +1,6 @@
 require_relative 'checkin'
 
-module V1
+module Models::V1
   ResourceOrganizer = Struct.new(:resource, :user, :role) do
     def as_json(options = {})
       {

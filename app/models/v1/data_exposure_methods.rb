@@ -1,4 +1,4 @@
-module V1
+module Models::V1
   module DataExposureMethods
     def self.included(base)
       base.send(:cattr_accessor, :fields, :internals)

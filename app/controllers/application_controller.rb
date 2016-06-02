@@ -1,3 +1,5 @@
+require_relative '../models/v1/user'
+
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -7,7 +9,15 @@ class ApplicationController < ActionController::Base
 
   # @todo: sort this out once there's a V2
   def current_user
-    @current_user ||= V1::User.find(session[:user_id]) if session[:user_id]
+    return unless doorkeeper_token
+
+    user_model_class.find(doorkeeper_token.resource_owner_id)
+  rescue => e
+    nil
+  end
+
+  def user_model_class
+    Models::V1::User
   end
 
   helper_method :current_user

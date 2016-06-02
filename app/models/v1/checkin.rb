@@ -3,7 +3,7 @@ require_relative 'event'
 require_relative 'profile'
 require_relative 'user'
 
-module V1
+module Models::V1
   class Checkin < PodsModel
     include DataExposureMethods
 

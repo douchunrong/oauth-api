@@ -1,7 +1,7 @@
 require_relative 'pods_model'
 require_relative 'checkin'
 
-module V1
+module Models::V1
   # A Waiver is comprised of two parts:
   #  1) the copy to which a user agrees
   #  2) a set of required data (address, for example) which is made

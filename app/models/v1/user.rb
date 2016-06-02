@@ -5,7 +5,7 @@ require_relative 'data_exposure_methods'
 require_relative 'checkin'
 require_relative 'event'
 
-module V1
+module Models::V1
   class User < WPDB::User
     include ActiveRecordSequelAdapter
     include DataExposureMethods

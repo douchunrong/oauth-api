@@ -3,7 +3,7 @@ require_relative 'checkin'
 require_relative 'image'
 require_relative 'location'
 
-module V1
+module Models::V1
   Insurance = Struct.new(:company, :type, :phone, :group_number, :member_number)
 
   class Profile < PodsModel

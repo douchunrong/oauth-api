@@ -1,4 +1,4 @@
-module V1
+module Models::V1
   Address = Struct.new(:street, :unit, :city, :state, :zip)
 
   class Location < Sequel::Model(:"#{WPDB.prefix}geo_mashup_locations")

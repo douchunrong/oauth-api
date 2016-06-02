@@ -20,7 +20,7 @@ database_uri += "?socket=#{ socket }" if socket.present?
 WPDB.init(database_uri)
 # ******* END 'I have no idea what Im doing' *******
 
-module V1
+module Models::V1
   class PodsModel < WPDB::Post
     include ActiveRecordSequelAdapter
 

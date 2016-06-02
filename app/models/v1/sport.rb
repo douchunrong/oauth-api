@@ -1,7 +1,7 @@
 require_relative 'pods_model'
 require_relative 'sport'
 
-module V1
+module Models::V1
   class Sport < PodsModel
     include DataExposureMethods
 

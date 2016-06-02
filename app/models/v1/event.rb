@@ -5,7 +5,7 @@ require_relative 'resource_organizer'
 require_relative 'sport'
 require_relative 'waiver'
 
-module V1
+module Models::V1
   class Event < PodsModel
     include DataExposureMethods
 

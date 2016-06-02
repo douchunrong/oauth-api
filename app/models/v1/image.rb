@@ -2,7 +2,7 @@ require 'php_serialize'
 
 require_relative 'pods_model'
 
-module V1
+module Models::V1
   class Image < PodsModel
     include DataExposureMethods
 
