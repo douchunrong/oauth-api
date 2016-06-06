@@ -21,7 +21,7 @@ module Models::V1
     many_to_one :created_by, {
       key: :post_author,
       primary_key: :ID,
-      class: 'V1::User'
+      class: 'Models::V1::User'
     }
 
     def checkins
@@ -37,13 +37,13 @@ module Models::V1
       right_key: :location_id,
       left_key: :object_id,
       join_table: "#{WPDB.prefix}geo_mashup_location_relationships",
-      class: 'V1::Location'
+      class: 'Models::V1::Location'
     }
 
     # one_to_one :logo, {
     #   key: :ID,
     #   primary_key: :logo,
-    #   class: 'V1::Image'
+    #   class: 'Models::V1::Image'
     # }
     def logo
       Image.find(meta_value(:logo))
@@ -74,13 +74,7 @@ module Models::V1
     end
 
     class << self
-      def filter_by_title(title_filter)
-        return self unless title_filter.present?
-
-        where(Sequel.like(:post_title, "%#{ title_filter }%"))
-      end
-
-      def accessible_to(user, title_filter = nil)
+      def accessible_to_condition(user)
         condition = Sequel.expr(post_author: user.id)
 
         organizable_ids = WPDB::PostMeta
@@ -88,10 +82,6 @@ module Models::V1
           .where(meta_key: 'organizer', meta_value: user.id)
 
         condition |= Sequel.expr(id: organizable_ids)
-
-        filter_by_title(title_filter)
-          .where(condition)
-          .all
       end
     end
   end

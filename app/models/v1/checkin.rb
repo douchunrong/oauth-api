@@ -18,7 +18,7 @@ module Models::V1
     many_to_one :created_by, {
       key: :post_author,
       primary_key: :ID,
-      class: 'V1::User'
+      class: 'Models::V1::User'
     }
 
     def checked_in_by
@@ -45,7 +45,7 @@ module Models::V1
     end
 
     class << self
-      def accessible_to(user, filter = nil)
+      def accessible_to(user, limit = 10, page = 1, filter = nil)
         # all checkins for this user, this user's profiles, etc
         user.checkins
       end

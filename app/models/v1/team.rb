@@ -23,13 +23,13 @@ module Models::V1
     many_to_one :created_by, {
       key: :post_author,
       primary_key: :ID,
-      class: 'V1::User'
+      class: 'Models::V1::User'
     }
 
     # one_to_one :logo, {
     #   key: :ID,
     #   primary_key: :logo,
-    #   class: 'V1::Image'
+    #   class: 'Models::V1::Image'
     # }
     def logo
       Image.find(meta_value(:logo))
@@ -57,7 +57,11 @@ module Models::V1
     end
 
     def metadata
-      PHP.unserialize meta_value(:_wp_attachment_metadata)
+      meta = meta_value(:_wp_attachment_metadata)
+
+      return unless meta.present?
+
+      PHP.unserialize meta
     end
 
     def organizers
@@ -76,7 +80,6 @@ module Models::V1
       options = options.try(:clone) || {}
 
       options[:methods] ||= []
-      options[:methods] << :addresses
       options[:methods] << :external_ids
       options[:methods] << :locations
       options[:methods] << :logo
@@ -88,6 +91,61 @@ module Models::V1
       super(options)
     end
 
+    def readable_by?(user)
+      return true if created_by_id == user.id
+
+      return true if postmetas.any? do |meta|
+        meta[:meta_key] == 'organizer'.freeze
+        meta[:meta_value] == user.id
+      end
+
+      is_member?(user)
+    end
+
+    # @todo... oh god!
+    # WARNING: REQUIRES team_profile_map
+    # create view team_profile_map as
+    # (select team.post_id as `membership_id`, team.meta_value as `team_id`, profile.meta_value as `profile_id` from wp_postmeta team inner join wp_postmeta profile on team.meta_key = 'team' and profile.meta_key = 'profile' and team.post_id = profile.post_id);
+    def is_member?(user)
+      # if user's profiles have memeberships for this team
+      profile_ids = user.profiles.select(:id).sql
+
+      DB["SELECT 1 FROM team_profile_map WHERE team_id = ? AND profile_id IN (#{ profile_ids }) LIMIT 1", id].any?
+    end
+
+    def editable_by?(user)
+      return true if created_by_id == user.id
+
+      # @todo: check role
+
+      postmetas.any? do |meta|
+        meta[:meta_key] == 'organizer'.freeze
+        meta[:meta_value] == user.id
+      end
+    end
+
+    def deleteable_by?(user)
+      created_by_id == user.id
+    end
+
+    def save!(hash = {})
+      if hash.blank?
+        create! unless id.present?
+      else
+        update(hash)
+      end
+    end
+
+    def update(hash)
+      field_data = hash.slice(*self.class.fields)
+
+      # check for updates?
+      # raise ValidationError.new(self) unless valid?
+      # update sub-resources?
+
+      super(field_data)
+    end
+
     class << self
       def filter_by_title(title_filter)
         return self unless title_filter.present?
@@ -95,7 +153,7 @@ module Models::V1
         where(Sequel.like(:post_title, "%#{ title_filter }%"))
       end
 
-      def accessible_to(user, title_filter = nil)
+      def accessible_to_condition(user)
         condition = Sequel.expr(post_author: user.id)
 
         organizable_ids = WPDB::PostMeta
@@ -103,10 +161,6 @@ module Models::V1
           .where(meta_key: 'organizer', meta_value: user.id)
 
         condition |= Sequel.expr(id: organizable_ids)
-
-        filter_by_title(title_filter)
-          .where(condition)
-          .all
       end
     end
   end

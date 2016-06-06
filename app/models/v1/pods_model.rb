@@ -35,13 +35,49 @@ module Models::V1
     plugin(:after_initialize)
 
     dataset_module do
+      # there is some fucking magic in here
       def active
-        filter(post_type: model.post_type)
+        post_type = model.post_type
+
+        where{
+          Sequel.&(
+            Sequel.~(post_status: Status::DELETED),
+            { post_type: post_type }
+          )
+        }
       end
+    end
+
+    module Status
+      DELETED = 'trash'.freeze
+      DRAFT = 'draft'.freeze
+      PUBLISHED = 'publish'.freeze
+    end
+
+    def destroy!
+      update(post_status: Status::DELETED)
     end
 
     class << self
       attr_reader :post_type
+
+      def accessible_to_condition(user)
+        raise NotImplementedError
+      end
+
+      def fields_filters_pagination_and_sort(params)
+        params ||= {}
+        fields = (params[:fields] || '')
+          .split(',')
+          .map(&:strip)
+          .reject(&:blank?)
+
+        select(*fields).tap do |query|
+          apply_filters!(query, params[:filters])
+          apply_pagination!(query, params[:pagination])
+          apply_sort!(query, params[:order_by])
+        end
+      end
 
       protected
 
@@ -51,6 +87,50 @@ module Models::V1
         # roughly equivalent to ActiveRecord default_scope
         # called here to ensure that post_type is set
         set_dataset(active)
+      end
+
+      def apply_filters!(query, filters)
+        filters ||= {}
+
+        clause = Sequel.expr(
+          post_status: filters[:status] || Status::PUBLISHED
+        )
+
+        if filters[:title].present?
+          clause |= Sequel.like(:post_title, "%#{ filters[:title] }%")
+        end
+
+        query.where!(clause)
+      end
+
+      def apply_pagination!(query, options)
+        options ||= {}
+
+        limit = options[:limit].to_i
+        limit = 10 if limit.zero?
+
+        page = options[:page].to_i
+        page = 1 if page.zero?
+
+        offset = (page - 1) * limit
+
+        query.limit!(limit).offset!(offset)
+      end
+
+      # @todo: allow fields to be an array
+      def apply_sort!(query, fields)
+        # @todo: allow filters to be on nicenames, not wordpress column names
+        # i.e., title, not post_title
+        fields ||= :post_title
+
+        order =
+          if fields =~ /^-/
+            Sequel.desc(fields[1..-1])
+          else
+            Sequel.asc(fields)
+          end
+
+        query.order!(order)
       end
 
       private

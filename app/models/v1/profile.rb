@@ -43,22 +43,31 @@ module Models::V1
     #   primary_key: :profile_ID
     # }
 
+    # @todo: current structure does not support multiple parents
+    # there is no reference to user_id in metadata, instead,
+    # post_author is used as the pointer to the users table.
+    def users
+      [
+        User.find(post_author)
+      ]
+    end
+
     many_to_many :checkins, {
       key: :profile,
-      class: 'V1::Checkin'
+      class: 'Models::V1::Checkin'
     }
 
     one_to_one :profile_photo, {
       key: :ID,
       primary_key: :profile_photo_attachment_id,
-      class: 'V1::Image'
+      class: 'Models::V1::Image'
     }
 
     # @todo: many_to_one
     one_to_one :birth_date_proof, {
       key: :ID,
       primary_key: :birth_date_proof_attachment_id,
-      class: 'V1::Image'
+      class: 'Models::V1::Image'
     }
     alias _birth_date_proof birth_date_proof
 
@@ -69,7 +78,7 @@ module Models::V1
     one_to_one :cover_image, {
       key: :ID,
       primary_key: :cover_image_attachment_id,
-      class: 'V1::Image'
+      class: 'Models::V1::Image'
     }
 
     def allergies

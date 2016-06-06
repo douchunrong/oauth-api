@@ -38,26 +38,30 @@ module Models::V1
     one_to_many :checkins_created, {
       key: :post_author,
       primary_key: :ID,
-      class: 'V1::Checkin'
+      class: 'Models::V1::Checkin'
     }
 
     # one_to_many :checkins, {
     #   key: :checked_in_by,
-    #   class: :'V1::Checkin'
+    #   class: :'Models::V1::Checkin'
     # }
     def checkins
       checkins_created
     end
 
+    def profiles
+      Profile.where(post_author: id)
+    end
+
     one_to_many :events_created, {
       key: :post_author,
       primary_key: :ID,
-      class: 'V1::Event'
+      class: 'Models::V1::Event'
     }
 
     # one_to_many :events, {
     #   ...
-    #   class: :'V1::Event'
+    #   class: :'Models::V1::Event'
     # }
     def events
       events_created
