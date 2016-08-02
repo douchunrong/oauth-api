@@ -3,17 +3,15 @@ require_relative 'application_controller'
 
 class SessionsController < ApplicationController
   def new
-    session[:redirect_uri] = params[:redirect_uri]
-
     @user = user_class.new.tap do |user|
       user.email = params[:username]
     end
   end
 
   def create
-    @user = user_class.find_by_email(params[:email])
+    @user = user_class.authenticate(params[:email], params[:password])
 
-    if @user && @user.authenticate(params[:password])
+    if @user.present?
       session[:user_id] = @user.id
       redirect_to(session[:redirect_uri] || root_url, notice: 'Logged in!')
       session.delete(:redirect_uri)

@@ -1,7 +1,5 @@
 require_relative '../../application_controller'
 
-# @todo: should this even be a controller?
-#        should it rather be a subcontroller of profile and event?
 class Api::V1::ApiController < ApplicationController
   respond_to :json
 
@@ -26,12 +24,10 @@ class Api::V1::ApiController < ApplicationController
   def show
     resource = self.class.model_class.find(params[:id])
 
-    raise NotFoundError, params[:id] if resource.nil?
-
     raise PermissionError, :read unless resource.readable_by?(current_user)
 
     render(json: resource.as_json)
-  rescue NotFoundError => e
+  rescue ActiveRecord::RecordNotFound => e
     not_found!(e.message)
   rescue PermissionError => e
     permission_error!(e.message)
@@ -40,14 +36,12 @@ class Api::V1::ApiController < ApplicationController
   def update
     resource = self.class.model_class.find(params[:id])
 
-    raise NotFoundError, params[:id] if resource.nil?
-
     raise PermissionError, :edit unless resource.editable_by?(current_user)
 
     resource.save!(params)
 
     render(json: resource.as_json)
-  rescue NotFoundError => e
+  rescue ActiveRecord::RecordNotFound => e
     not_found!(e.message)
   rescue PermissionError => e
     permission_error!(e.message)
@@ -56,14 +50,12 @@ class Api::V1::ApiController < ApplicationController
   def destroy
     resource = self.class.model_class.find(params[:id])
 
-    raise NotFoundError, params[:id] if resource.nil?
-
     raise PermissionError, :delete unless resource.deletable_by?(current_user)
 
     resource.destroy!
 
     head :no_content
-  rescue NotFoundError => e
+  rescue ActiveRecord::RecordNotFound => e
     not_found!(e.message)
   rescue PermissionError => e
     permission_error!(e.message)
@@ -84,11 +76,10 @@ class Api::V1::ApiController < ApplicationController
   end
 
   def list(params)
-    self.class.model_class.fields_filters_pagination_and_sort(params)
+    self.class.model_class.accessible_to(current_user)
       .tap do |query|
-        next if current_user.admin?
-
-        query.where!(self.class.model_class.accessible_to(current_user))
+        query.limit!(params[:limit] || 10)
+        query.offset!(params[:offset] || 0)
       end
   end
 

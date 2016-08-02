@@ -1,37 +1,47 @@
-module Models::V1
-  Address = Struct.new(:street, :unit, :city, :state, :zip)
+require_relative 'base'
+require_relative 'association'
+require_relative 'division'
+require_relative 'event'
+require_relative 'organization'
+require_relative 'profile'
+require_relative 'team'
 
-  class Location < Sequel::Model(:"#{WPDB.prefix}geo_mashup_locations")
-    def coordinates
-      [lat, lng]
+module Models
+  module V1
+    # @todo: Combine v1_location w/v1_resource_location
+    class Location < ActiveRecord::Base
+      extend Base
+
+      # attr_accessible :name, :description, :address
+      # attr_accessible :user_latitude, :user_longitude
+      # attr_accessible :latitude, :longitude
+
+      # not positive what this is...
+      # has_many :resources, class_name: 'Models::V1::ResourceLocation'
     end
 
-    def as_json(options = {})
-      options = options.try(:clone) || {}
-
-      (options[:except] ||= []) << :lat << :lng
-      (options[:methods] ||= []) << :coordinates
-
-      super(options)
+    class AssociationLocation < Location
+      belongs_to :assoc, class_name: 'Models::V1::Association'
     end
 
-    class << self
-      def from_address(address)
-        full_address = [
-          address.street,
-          address.unit,
-          "#{ address.city }, #{ address.state }",
-          address.zip
-        ].compact.join(' ')
-        postal_code = address.zip
-        country_code = 'US'
+    class DivisionLocation < Location
+      belongs_to :division
+    end
 
-        new({
-          address: full_address,
-          postal_code: postal_code,
-          country_code: country_code
-        })
-      end
+    class EventLocation < Location
+      belongs_to :event
+    end
+
+    class OrganizationLocation < Location
+      belongs_to :organization
+    end
+
+    class ProfileLocation < Location
+      belongs_to :profile
+    end
+
+    class TeamLocation < Location
+      belongs_to :team
     end
   end
 end

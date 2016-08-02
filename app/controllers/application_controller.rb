@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # @todo: sort this out once there's a V2
   def current_user
     return unless doorkeeper_token
 

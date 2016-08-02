@@ -4,8 +4,13 @@ Doorkeeper.configure do
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    Models::V1::User.find(session[:user_id]) || # Models::V1::User.find(session[:user_id]) ||
+    begin
+      Models::V1::User.find(session[:user_id])
+    rescue ActiveRecord::RecordNotFound
+      session[:redirect_uri] = request.original_url
+
       redirect_to(new_session_url)
+    end
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
@@ -93,12 +98,23 @@ Doorkeeper.configure do
   #
   # grant_flows %w(authorization_code client_credentials)
 
+
+
+
+
+
+
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
   # For example if dealing with a trusted application.
   # skip_authorization do |resource_owner, client|
   #   client.superapp? or resource_owner.admin?
   # end
+
+
+
+
+
 
   # WWW-Authenticate Realm (default "Doorkeeper").
   realm "SPORT_iD"

@@ -77,7 +77,6 @@ GEM
     mini_portile2 (2.0.0)
     minitest (5.9.0)
     multi_json (1.12.1)
-    mysql (2.9.1)
     mysql2 (0.4.4)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -164,7 +163,7 @@ DEPENDENCIES
   doorkeeper
   jbuilder (~> 2.0)
   jquery-rails
-  mysql
+  mysql2
   php_serialize
   phpass-ruby
   pry-rails
@@ -177,4 +176,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

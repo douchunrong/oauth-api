@@ -1,12 +1,16 @@
-require_relative 'pods_model'
-require_relative 'sport'
+require_relative 'base'
+require_relative 'event'
+require_relative 'team'
 
-module Models::V1
-  class Sport < PodsModel
-    include DataExposureMethods
+module Models
+  module V1
+    # @todo: s/slug/name, s/name/label
+    class Sport < ActiveRecord::Base
+      extend Base
 
-    pods_type('sprtid_sport')
-
-    initialize_common_pods_methods!
+      # attr_accessible :slug, :name, :description
+      has_many :events
+      has_many :teams
+    end
   end
 end

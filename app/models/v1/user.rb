@@ -1,86 +1,72 @@
 require 'phpass'
 
-require_relative 'active_record_sequel_adapter'
-require_relative 'data_exposure_methods'
-require_relative 'checkin'
-require_relative 'event'
+require_relative 'base'
+# to avoid circular dependencies, do not `require` other classes here.
 
-module Models::V1
-  class User < WPDB::User
-    include ActiveRecordSequelAdapter
-    include DataExposureMethods
+module Models
+  module V1
+    class WaiverSigning < ActiveRecord::Base
+      extend Base
 
-    attr_accessor :meta_lookup
+      belongs_to :waiver
+      belongs_to :signature, class_name: 'Models::V1::Signature'
 
-    def after_initialize
-      self.meta_lookup = Hash[
-        usermeta.map { |m| [m.meta_key.to_sym, m] }
-      ]
+      has_one :access_grant
     end
 
-    plugin :after_initialize
+    class User < ActiveRecord::Base
+      self.table_name = 'wp_users'
 
-    field :created_at, :user_registered
-    field :email, :user_email
-    field :id, :ID
-    field :login, :user_login
+      extend Base
+      def self.default_scope; end
 
-    ignore :display_name
-    ignore :user_activation_key
-    ignore :user_nicename
-    ignore :user_pass
-    ignore :user_status
-    ignore :user_url
+      def self.columns
+        super.reject do |column|
+          %w(
+            user_login
+            user_nicename
+            user_url
+            user_activation_key
+            user_status
+            display_name
+          ).include?(column.name)
+        end
+      end
 
-    metafield :first_name
-    metafield :last_name
+      # accessors are created on the fly, so `alias` complains
+      def id; self.ID; end
+      def created_at; user_registered; end
+      def modified_at; user_registered; end
+      def email; user_email; end
+      def email=(val); self.user_email = val; end
 
-    one_to_many :checkins_created, {
-      key: :post_author,
-      primary_key: :ID,
-      class: 'Models::V1::Checkin'
-    }
+      def as_json(options = {})
+        super(only: [], methods: %w(id created_at modified_at email))
+      end
 
-    # one_to_many :checkins, {
-    #   key: :checked_in_by,
-    #   class: :'Models::V1::Checkin'
-    # }
-    def checkins
-      checkins_created
-    end
+      def admin?
+        user_email =~ /@(sprtid|sportidapp).com/i
+      end
 
-    def profiles
-      Profile.where(post_author: id)
-    end
+      private
 
-    one_to_many :events_created, {
-      key: :post_author,
-      primary_key: :ID,
-      class: 'Models::V1::Event'
-    }
+      has_many :access_grants, inverse_of: :granted_by
+      has_many :invitations, inverse_of: :invited_by
+      has_many :invites, class_name: 'Models::V1::UserInvite'
+      # user's can flag one profile as their own
+      has_one :profile
+      has_many :signatures, inverse_of: :signed_by
 
-    # one_to_many :events, {
-    #   ...
-    #   class: :'Models::V1::Event'
-    # }
-    def events
-      events_created
-    end
+      class << self
+        def authenticate(email, password)
+          user = find_by(user_email: email)
 
-    ADMIN_USER_LEVEL = '10'.freeze
-    def admin?
-      meta_lookup[:wp_user_level].try(:meta_value) == ADMIN_USER_LEVEL
-    end
+          # @todo: do not bring password back from the database,
+          #        instead, hash it here, and pass that to the DB
+          return unless Phpass.new(8).check(password, user.user_pass)
 
-    # validates :email, presence: true
-
-    def authenticate(password)
-      Phpass.new(8).check(password, user_pass)
-    end
-
-    class << self
-      def find_by_email(email)
-        where(user_email: email).limit(1).first
+          user
+        end
       end
     end
   end

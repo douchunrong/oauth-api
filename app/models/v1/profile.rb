@@ -1,114 +1,44 @@
-require_relative 'pods_model'
-require_relative 'checkin'
-require_relative 'image'
+require_relative '../../helpers/organizable'
+require_relative 'base'
+require_relative 'access_grant'
+require_relative 'event_participant'
+require_relative 'external_source'
+require_relative 'invite'
 require_relative 'location'
+require_relative 'organization_number'
+require_relative 'organizer'
+require_relative 'profile_datum'
+require_relative 'team'
+require_relative 'user'
+require_relative 'waiver'
 
-module Models::V1
-  Insurance = Struct.new(:company, :type, :phone, :group_number, :member_number)
+module Models
+  module V1
+    class Profile < ActiveRecord::Base
+      extend Base
+      extend Organizable
 
-  class Profile < PodsModel
-    include DataExposureMethods
+      # token :sport_id_code
 
-    pods_type('sprtid_profile')
+      # user's can flag one profile as their own
+      belongs_to :user
 
-    initialize_common_pods_methods!
+      has_many :access_grants
+      has_many :event_participants, class_name: 'Models::V1::ProfileEventParticipant'
+      has_many :invites, class_name: 'Models::V1::ProfileInvite'
+      has_many :locations, class_name: 'Models::V1::ProfileLocation'
+      has_many :organization_numbers
+      has_many :organizers, class_name: 'Models::V1::ProfileOrganizer'
+      # plural hell!
+      has_many :profile_data, {
+        class_name: 'Models::V1::ProfileDatum',
+        inverse_of: :profile
+      }
+      has_many :external_sources, class_name: 'Models::V1::ProfileExternalSource'
+      has_many :teams, through: :team_membership
 
-    metafield :first_name
-    metafield :middle_initial
-    metafield :last_name
-    metafield :birth_date
-    metafield :sprtid_code
-    metafield :email
-    metafield :phone
-    metafield :gender
-
-    metafield :insurance # hacking this into fields, even though method is below
-
-    # @todo: idk... do something with this
-    metafield :school
-    metafield :graduation_year
-
-    metafield :medical_history
-
-    metafield :current_medication
-    metafield :current_injury_or_illness
-
-    metafield :height
-    metafield :weight
-    metafield :profile_type
-    metafield :allergies # Array
-
-    # many_to_many :guardians, {
-    #   key: :guardian_ID,
-    #   primary_key: :profile_ID
-    # }
-
-    # @todo: current structure does not support multiple parents
-    # there is no reference to user_id in metadata, instead,
-    # post_author is used as the pointer to the users table.
-    def users
-      [
-        User.find(post_author)
-      ]
-    end
-
-    many_to_many :checkins, {
-      key: :profile,
-      class: 'Models::V1::Checkin'
-    }
-
-    one_to_one :profile_photo, {
-      key: :ID,
-      primary_key: :profile_photo_attachment_id,
-      class: 'Models::V1::Image'
-    }
-
-    # @todo: many_to_one
-    one_to_one :birth_date_proof, {
-      key: :ID,
-      primary_key: :birth_date_proof_attachment_id,
-      class: 'Models::V1::Image'
-    }
-    alias _birth_date_proof birth_date_proof
-
-    def birth_date_proof
-      [_birth_date_proof]
-    end
-
-    one_to_one :cover_image, {
-      key: :ID,
-      primary_key: :cover_image_attachment_id,
-      class: 'Models::V1::Image'
-    }
-
-    def allergies
-      postmetas
-        .select { |m| m[:mete_key] == __method__.to_s }
-        .map { |m| m[:meta_value] }
-    end
-
-    def addresses
-      [
-        Location.from_address(
-          Address.new(
-            meta_value(:street_address),
-            meta_value(:unit),
-            meta_value(:city),
-            meta_value(:state),
-            meta_value(:zip)
-          )
-        )
-      ]
-    end
-
-    def insurance
-      Insurance.new(
-        meta_value(:insurance_company_name),
-        meta_value(:insurance_plan_type),
-        meta_value(:insurance_phone_number),
-        meta_value(:insurance_member_number),
-        meta_value(:insurance_group_number)
-      )
+      # dafuq is a profile waiver?
+      has_many :waivers, class_name: 'Models::V1::ProfileWavier'
     end
   end
 end
