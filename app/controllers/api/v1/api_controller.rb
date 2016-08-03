@@ -6,7 +6,13 @@ class Api::V1::ApiController < ApplicationController
   before_action :doorkeeper_authorize!
 
   def index
-    render(json: list(params).map(&:as_json))
+    options = {}
+
+    if params[:include].present?
+      options[:include] = params[:include].split(',').map(&:to_sym)
+    end
+
+    render(json: list(params).map { |r| r.as_json(options) })
   end
 
   def create
@@ -80,7 +86,19 @@ class Api::V1::ApiController < ApplicationController
       .tap do |query|
         query.limit!(params[:limit] || 10)
         query.offset!(params[:offset] || 0)
+
+        if params[:include].present?
+          query.includes!(params[:include].split(','))
+        end
+
+        if params[:name].present?
+          append_title_filter!(query, params[:name])
+        end
       end
+  end
+
+  def append_title_filter!(query, name)
+    query.where!('name like ?', "%#{ params[:name] }%")
   end
 
   class << self

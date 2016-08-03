@@ -48,6 +48,16 @@ module Models
         user_email =~ /@(sprtid|sportidapp).com/i
       end
 
+      # do not expose our WP internals
+      def serializable_hash(options = {})
+        {
+          id: id,
+          created_at: created_at,
+          modified_at: modified_at,
+          email: email
+        }
+      end
+
       private
 
       has_many :access_grants, inverse_of: :granted_by

@@ -3,8 +3,21 @@
 module Models
   module V1
     module Base
+      module InstanceMethods
+        def serializable_hash(options = {})
+          options ||= {}
+
+          excepts = [options[:except]].flatten +
+            %i(deleted_at migration_id).freeze
+
+          super(options.merge(except: excepts))
+        end
+      end
+
       class << self
         def extended(base)
+          base.include(InstanceMethods)
+
           base.table_name_prefix = 'v1_'
           base.primary_key = 'id' # @todo: is this necessary?
 
@@ -22,7 +35,6 @@ module Models
         end
 
         def accessible_to(user)
-p 'v'*100, __FILE__, __LINE__
           all
         end
       end

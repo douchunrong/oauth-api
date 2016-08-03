@@ -39,6 +39,51 @@ module Models
 
       # dafuq is a profile waiver?
       has_many :waivers, class_name: 'Models::V1::ProfileWavier'
+
+      # accepts standard otions as well as one special option: scopes
+      def serializable_hash(options = {})
+        options ||= {}
+
+        return super unless [options[:include]].flatten.include?(:profile_data)
+
+        super(except: :profile_data).tap do |hash|
+          hash[:profile_data] = serialized_scoped_data(options[:scopes])
+        end
+      end
+
+      def serialized_scoped_data(scope_names = nil)
+        data_map = profile_data.group_by(&:profile_data_type_id)
+
+        # todo: cache this!
+        scopes = Scope.includes(:profile_data_types).entries
+        scopes.select { |s| scope_names.include?(s) } unless scope_names.nil?
+
+        scopes.map do |scope|
+          types_hash = scope.profile_data_types.map do |type|
+              if data_map.key?(type.id)
+                type_data = type.singular ?
+                  data_map[type.id].first.data_value.as_json :
+                  data_map[type.id].map(&:data_value).map(&:as_json)
+              end
+
+              type.as_json({
+                only: %i(name description label singular).freeze
+              }).merge(type_data: type_data)
+            end
+
+          scope.as_json({
+            only: %i(name description label).freeze
+          }).merge(types: types_hash)
+        end
+      end
+
+      class << self
+        def with_profile_data(val)
+          ProfileDatum
+            .select(:profile_id)
+            .where('value LIKE ?', "%#{ val }%")
+        end
+      end
     end
   end
 end
