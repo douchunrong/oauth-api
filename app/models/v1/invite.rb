@@ -3,10 +3,10 @@ require_relative 'user'
 require_relative 'association'
 require_relative 'contact'
 require_relative 'division'
-require_relative 'event'
+require_relative 'place'
 require_relative 'organization'
 require_relative 'profile'
-require_relative 'team'
+require_relative 'group'
 
 module Models
   module V1
@@ -19,6 +19,15 @@ module Models
         class_name: 'Models::V1::User',
         inverse_of: :invitations
       }
+
+      class << self
+        def accessible_to(user)
+          where({
+            id: self.select(:id).where(user_email: user.email)
+              # .where('user_id = ? OR user_email = ?', user.id, user.email)
+          })
+        end
+      end
     end
 
     class AssociationInvite < Invite
@@ -33,8 +42,8 @@ module Models
       belongs_to :division
     end
 
-    class EventInvite < Invite
-      belongs_to :event
+    class PlaceInvite < Invite
+      belongs_to :place
     end
 
     class OrganizationInvite < Invite
@@ -45,8 +54,8 @@ module Models
       belongs_to :profile
     end
 
-    class TeamInvite < Invite
-      belongs_to :team
+    class GroupInvite < Invite
+      belongs_to :group
     end
 
     # class UserInvite < Invite

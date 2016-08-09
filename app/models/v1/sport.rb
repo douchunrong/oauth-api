@@ -1,6 +1,6 @@
 require_relative 'base'
-require_relative 'event'
-require_relative 'team'
+require_relative 'place'
+require_relative 'group'
 
 module Models
   module V1
@@ -9,8 +9,8 @@ module Models
       extend Base
 
       # attr_accessible :slug, :name, :description
-      has_many :events
-      has_many :teams
+      has_many :places
+      has_many :groups
     end
   end
 end

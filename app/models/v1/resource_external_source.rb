@@ -2,10 +2,10 @@ require_relative 'base'
 require_relative 'external_source'
 require_relative 'association'
 require_relative 'division'
-require_relative 'event'
+require_relative 'place'
 require_relative 'organization'
 require_relative 'profile'
-require_relative 'team'
+require_relative 'group'
 
 module Models
   module V1
@@ -25,8 +25,8 @@ module Models
       belongs_to :division
     end
 
-    class EventExternalSource < ResourceExternalSource
-      belongs_to :event
+    class PlaceExternalSource < ResourceExternalSource
+      belongs_to :place
     end
 
     class OrganizationExternalSource < ResourceExternalSource
@@ -37,8 +37,8 @@ module Models
       belongs_to :profile
     end
 
-    class TeamExternalSource < ResourceExternalSource
-      belongs_to :team
+    class GroupExternalSource < ResourceExternalSource
+      belongs_to :group
     end
   end
 end

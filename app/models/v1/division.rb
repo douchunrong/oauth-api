@@ -5,7 +5,7 @@ require_relative 'external_source'
 require_relative 'invite'
 require_relative 'location'
 require_relative 'organizer'
-require_relative 'team'
+require_relative 'group'
 require_relative 'waiver'
 
 module Models
@@ -25,7 +25,7 @@ module Models
       has_many :invites, class_name: 'Models::V1::DivisionInvite'
       has_many :locations, class_name: 'Models::V1::DivisionLocation'
       has_many :organizers, class_name: 'Models::V1::DivisionOrganizer'
-      has_many :teams
+      has_many :groups
       has_many :waivers, class_name: 'Models::V1::DivisionWaiver'
     end
   end

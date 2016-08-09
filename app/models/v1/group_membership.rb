@@ -1,14 +1,14 @@
 require_relative 'base'
-require_relative 'team'
+require_relative 'group'
 require_relative 'profile'
 require_relative 'user'
 
 module Models
   module V1
-    class TeamMembership < ActiveRecord::Base
+    class GroupMembership < ActiveRecord::Base
       extend Base
 
-      belongs_to :team
+      belongs_to :group
       belongs_to :profile
 
       # attr_accessible :uniform_number, :position

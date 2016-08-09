@@ -4,10 +4,10 @@ require_relative 'organizer_type'
 # circular dependencies
 # require_relative 'association'
 # require_relative 'division'
-# require_relative 'event'
+# require_relative 'place'
 # require_relative 'organization'
 # require_relative 'profile'
-# require_relative 'team'
+# require_relative 'group'
 
 module Models
   module V1
@@ -60,8 +60,8 @@ module Models
     end
 
     # e.g., Host
-    class EventOrganizer < Organizer
-      resource :event, 'Models::V1::Event'
+    class PlaceOrganizer < Organizer
+      resource :event, 'Models::V1::Place'
     end
 
     # e.g., President
@@ -75,8 +75,8 @@ module Models
     end
 
     # e.g., Coach
-    class TeamOrganizer < Organizer
-      resource :team, 'Models::V1::Team'
+    class GroupOrganizer < Organizer
+      resource :team, 'Models::V1::Group'
     end
   end
 end

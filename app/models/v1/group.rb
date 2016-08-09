@@ -15,7 +15,7 @@ require_relative 'waiver'
 
 module Models
   module V1
-    class Team < ActiveRecord::Base
+    class Group < ActiveRecord::Base
       extend Base
       extend Organizable
 
@@ -31,13 +31,15 @@ module Models
       belongs_to :logo, class_name: 'Models::V1::Attachment'
 
       # has_many :external_sites
-      has_many :event_participants, class_name: 'Models::V1::ProfileEventParticipant'
-      has_many :invites, class_name: 'Models::V1::TeamInvite'
-      has_many :locations, class_name: 'Models::V1::TeamLocation'
-      has_many :organizers, class_name: 'Models::V1::TeamOrganizer'
-      has_many :external_sources, class_name: 'Models::V1::TeamExternalSource'
+      has_many :place_participants, class_name: 'Models::V1::ProfileEventParticipant'
+      has_many :invites, class_name: 'Models::V1::GroupInvite'
+      has_many :locations, class_name: 'Models::V1::GroupLocation'
+      has_many :organizers, class_name: 'Models::V1::GroupOrganizer'
+      has_many :external_sources, class_name: 'Models::V1::GroupExternalSource'
       has_many :profiles, through: :team_membership
-      has_many :waivers, class_name: 'Models::V1::TeamWavier'
+      has_many :waivers, class_name: 'Models::V1::GroupWavier'
     end
+
+    class TeamGroup < Group; end
   end
 end

@@ -1,10 +1,10 @@
 require_relative 'base'
 require_relative 'association'
 require_relative 'division'
-require_relative 'event'
+require_relative 'place'
 require_relative 'organization'
 require_relative 'profile'
-require_relative 'team'
+require_relative 'group'
 
 module Models
   module V1
@@ -28,8 +28,8 @@ module Models
       belongs_to :division
     end
 
-    class EventLocation < Location
-      belongs_to :event
+    class PlaceLocation < Location
+      belongs_to :place
     end
 
     class OrganizationLocation < Location
@@ -40,8 +40,8 @@ module Models
       belongs_to :profile
     end
 
-    class TeamLocation < Location
-      belongs_to :team
+    class GroupLocation < Location
+      belongs_to :group
     end
   end
 end

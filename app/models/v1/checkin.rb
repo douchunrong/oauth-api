@@ -1,5 +1,5 @@
 require_relative 'access_grant'
-require_relative 'event'
+require_relative 'place'
 
 module Models
   module V1

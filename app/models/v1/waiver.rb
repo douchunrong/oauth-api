@@ -3,10 +3,10 @@ require_relative 'profile_data_type'
 require_relative 'signature'
 require_relative 'association'
 require_relative 'division'
-require_relative 'event'
+require_relative 'place'
 require_relative 'organization'
 require_relative 'profile'
-require_relative 'team'
+require_relative 'group'
 
 module Models
   module V1
@@ -28,8 +28,8 @@ module Models
       belongs_to :division
     end
 
-    class EventWavier < Waiver
-      belongs_to :event
+    class PlaceWavier < Waiver
+      belongs_to :place
     end
 
     class OrganizationWavier < Waiver
@@ -41,8 +41,8 @@ module Models
       belongs_to :profile
     end
 
-    class TeamWavier < Waiver
-      belongs_to :team
+    class GroupWavier < Waiver
+      belongs_to :group
     end
   end
 end

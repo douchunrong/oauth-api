@@ -35,7 +35,7 @@ module Models
         class_name: 'Models::V1::AssociationWaiver',
         inverse_of: :assoc
       }
-      has_many :teams, inverse_of: :assoc
+      has_many :groups, inverse_of: :assoc
     end
   end
 end

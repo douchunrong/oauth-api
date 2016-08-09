@@ -3,31 +3,28 @@ Dir.glob("#{app_root}/../app/controllers/**/*_controller.rb", &method(:require))
 
 Rails.application.routes.draw do
   use_doorkeeper
-  def api_version(version, &routes)
-    api_constraint = ApiConstraint.new(version: version)
-    scope(module: "api/v#{version}", constraints: api_constraint, &routes)
 
-    # cutely define the "no version" resource as the last one defined
-    # (assuming the last defined is the greatest version #)
-    scope(module: "api/v#{version}", &routes)
-  end
+  RESOURCE_ROUTES = %i(index create show update destroy).freeze
 
-  RESOURCE_ROUTES = %i(index create show update destroy)
-  api_version(1) do
-    resources :checkins, only: RESOURCE_ROUTES
-    resources :events, only: RESOURCE_ROUTES
-    resources :profiles, only: RESOURCE_ROUTES
-    resources :sports, only: RESOURCE_ROUTES
-    resources :teams, only: RESOURCE_ROUTES
-
-    resources :users, only: [:new, :create, :show]
+  namespace :controllers, path: '/' do # , constraints: { subdomain: 'api' } if production?
+    namespace :v1, path: 'v1' do
+      resources :checkins, only: RESOURCE_ROUTES
+      resources :division, only: RESOURCE_ROUTES
+      resources :groups, only: RESOURCE_ROUTES
+      resources :invites, only: RESOURCE_ROUTES
+      resources :organization, only: RESOURCE_ROUTES
+      resources :places, only: RESOURCE_ROUTES
+      resources :profiles, only: RESOURCE_ROUTES
+      resources :sports, only: RESOURCE_ROUTES
+      resources :users, only: [:new, :create, :show]
+    end
   end
 
   resources :sessions, only: [:new, :create]
   get '/logout', to: 'sessions#destroy', as: :logout
   delete '/logout', to: 'sessions#destroy'
 
-  get '/oauth/me', to: 'api/v1/credentials#me'
+  get '/oauth/me', to: 'controllers/v1/credentials#me'
 
   root to: 'pages#index'
   # The priority is based upon order of creation: first created -> highest priority.

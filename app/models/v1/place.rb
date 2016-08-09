@@ -11,7 +11,7 @@ require_relative 'waiver'
 
 module Models
   module V1
-    class Event < ActiveRecord::Base
+    class Place < ActiveRecord::Base
       extend Base
       extend Organizable
 
@@ -20,12 +20,12 @@ module Models
       belongs_to :sport
       belongs_to :logo, class_name: 'Models::V1::Attachment'
 
-      has_many :participants, class_name: 'Models::V1::EventParticipant'
-      has_many :invites, class_name: 'Models::V1::EventInvite'
-      has_many :locations, class_name: 'Models::V1::EventLocation'
-      has_many :organizers, class_name: 'Models::V1::EventOrganizer'
-      has_many :external_sources, class_name: 'Models::V1::EventExternalSource'
-      has_many :waivers, class_name: 'Models::V1::EventWavier'
+      has_many :participants, class_name: 'Models::V1::PlaceParticipant'
+      has_many :invites, class_name: 'Models::V1::PlaceInvite'
+      has_many :locations, class_name: 'Models::V1::PlaceLocation'
+      has_many :organizers, class_name: 'Models::V1::PlaceOrganizer'
+      has_many :external_sources, class_name: 'Models::V1::PlaceExternalSource'
+      has_many :waivers, class_name: 'Models::V1::PlaceWavier'
 
       class << self
         def accessible_to(user)
@@ -34,5 +34,7 @@ module Models
         end
       end
     end
+
+    class EventPlace < Place; end
   end
 end
