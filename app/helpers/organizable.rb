@@ -5,7 +5,7 @@ module Models
   module V1
     module Organizable
       def accessible_to(user)
-        # return all if user.admin?
+        return all if user.admin?
 
         where(id: Organizer.resources_for_user(self, user))
       end

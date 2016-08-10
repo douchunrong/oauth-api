@@ -26,7 +26,7 @@ module Models
 
       def serializable_hash(options = {})
         super(except: %i(meta migration_meta)).tap do |hash|
-          hash[:meta] = JSON.parse(meta)
+          hash[:meta] = JSON.parse(meta) unless meta.nil?
         end
       end
     end

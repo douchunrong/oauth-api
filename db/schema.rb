@@ -97,7 +97,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "deleted_at"
     t.string   "name",           limit: 255
     t.text     "description",    limit: 65535
-    t.string   "meta",           limit: 30000
+    t.json     "meta",           limit: 30000
     t.string   "mime_type",      limit: 255
     t.integer  "migration_id",   limit: 8
     t.string   "migration_meta", limit: 30000

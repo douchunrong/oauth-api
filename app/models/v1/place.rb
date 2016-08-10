@@ -27,6 +27,16 @@ module Models
       has_many :external_sources, class_name: 'Models::V1::PlaceExternalSource'
       has_many :waivers, class_name: 'Models::V1::PlaceWavier'
 
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        if association(:logo).loaded?
+          options[:include] = [options[:include]].flatten.compact << :logo
+        end
+
+        super(options)
+      end
+
       class << self
         def accessible_to(user)
           # even though organizable, show all

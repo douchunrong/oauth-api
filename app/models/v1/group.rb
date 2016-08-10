@@ -38,6 +38,16 @@ module Models
       has_many :external_sources, class_name: 'Models::V1::GroupExternalSource'
       has_many :profiles, through: :team_membership
       has_many :waivers, class_name: 'Models::V1::GroupWavier'
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        if associate(:logo).loaded?
+          options[:include] = [options[:include]].flatten.compact << :logo
+        end
+
+        super(options)
+      end
     end
 
     class TeamGroup < Group; end
