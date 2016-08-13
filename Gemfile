@@ -23,6 +23,8 @@ gem 'php_serialize'
 
 # Oauth2 Provider
 gem 'doorkeeper'
+# @todo:
+# gem 'doorkeeper-jwt'
 
 # Auth Pages
 gem 'jquery-rails'
