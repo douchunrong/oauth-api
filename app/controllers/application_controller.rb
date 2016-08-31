@@ -7,10 +7,14 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def current_user_id
+    doorkeeper_token.resource_owner_id
+  end
+
   def current_user
     return unless doorkeeper_token
 
-    user_model_class.find(doorkeeper_token.resource_owner_id)
+    user_model_class.find(current_user_id)
   rescue => e
     nil
   end

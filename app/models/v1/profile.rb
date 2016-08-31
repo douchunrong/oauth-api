@@ -19,12 +19,40 @@ module Models
       extend Organizable
 
       # token :sport_id_code
+      before_create :create_unique_identifier
+      cattr_accessor :token_name
+
+      self.token_name = 'sport_id_code'
+
+      def create_unique_identifier
+        # generate 10 random strings
+        tokens = (1..10).to_a.map do
+          t = (1..8).to_a.map { (65 + (rand() * 26).floor).chr }.join
+
+          "SELECT CONVERT('#{ t }' using latin1) as token"
+        end
+
+        result = ActiveRecord::Base.connection.execute(%Q{
+          SELECT token FROM ( #{ tokens.join(' UNION ') } ) as tokens
+          WHERE NOT EXISTS (
+            SELECT 1
+            FROM `#{ self.class.table_name }`
+            WHERE `#{ self.class.token_name }` = tokens.token
+          )
+          LIMIT 1;
+        })
+
+        result.first.try(:first)
+
+        self.send :"#{ self.class.token_name }=", result.first.try(:first)
+      end
 
       # user's can flag one profile as their own
       belongs_to :user
 
       has_many :access_grants
-      has_many :place_participants, class_name: 'Models::V1::ProfileEventParticipant'
+      # @todo: place_participants?
+      has_many :event_participants, class_name: 'Models::V1::ProfileEventParticipant'
       has_many :invites, class_name: 'Models::V1::ProfileInvite'
       has_many :locations, class_name: 'Models::V1::ProfileLocation'
       has_many :organization_numbers
@@ -68,7 +96,7 @@ module Models
 
               type.as_json({
                 only: %i(name description label singular).freeze
-              }).merge(type_data: type_data)
+              }).merge(data: type_data)
             end
 
           scope.as_json({

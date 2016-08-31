@@ -31,6 +31,39 @@ module Models
       def _data_value
         value
       end
+
+      class << self
+        def factory(type, attributes)
+          klass = descendants.find { |c| c.name == type } || self
+
+          klass.create(attributes)
+        end
+
+        # {
+        #   "scope.name" => {
+        #     "type.name" => value
+        #   }
+        # }
+        # caveat: despite some types allowing multiple values, this
+        # method will only accept single values
+        def from_scoped_hash(hash, profile = nil, created_by = nil)
+          types = ProfileDataType.includes(:scope).all
+
+          hash.flat_map do |scope_name, typed_data|
+            typed_data.map do |type_name, value|
+              type = types
+                .find { |t| t.scope.name == scope_name && t.name == type_name }
+
+              factory(type.data_type, {
+                created_by: created_by,
+                profile: profile,
+                profile_data_type: type,
+                value: value
+              })
+            end
+          end
+        end
+      end
     end
 
     class StringProfileDatum < ProfileDatum

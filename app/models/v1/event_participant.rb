@@ -5,6 +5,7 @@ require_relative 'group'
 
 module Models
   module V1
+    # @todo: PlaceParticipant?
     class EventParticipant < ActiveRecord::Base
       extend Base
 

@@ -4,6 +4,28 @@ module Models
   module V1
     module Base
       module InstanceMethods
+        def createable_by?(user, params)
+          user.present?
+        end
+
+        def readable_by?(user)
+          return false if user.nil?
+
+          created_by_id == user.id
+        end
+
+        def updateable_by?(user, params)
+          return false if user.nil?
+
+          created_by_id == user.id
+        end
+
+        def deletable_by?(user)
+          return false if user.nil?
+
+          created_by_id == user.id
+        end
+
         def serializable_hash(options = {})
           options ||= {}
 
@@ -29,8 +51,20 @@ module Models
         base.send :default_scope, ->{ base.where(deleted_at: nil) }
       end
 
+      def timestamp_attributes_for_update
+        super << :modified_at
+      end
+
+      def timestamp_attributes_for_create
+        super << :modified_at
+      end
+
       def columns
         super.reject { |c| c.name == 'migration_id' }
+      end
+
+      def column_keys
+        columns.map(&:name)
       end
 
       def accessible_to(user)

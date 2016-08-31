@@ -264,6 +264,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "modified_at"
     t.datetime "deleted_at"
     t.string   "user_email",               limit: 255
+    t.integer  "user_id",                  limit: 8
     t.string   "invited_by_friendly_name", limit: 255
     t.text     "message",                  limit: 65535
     t.string   "token",                    limit: 36,    null: false
@@ -349,7 +350,9 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.integer  "organization_id",   limit: 8
     t.integer  "profile_id",        limit: 8
     t.integer  "group_id",          limit: 8
+    t.boolean  "can_read"
     t.boolean  "can_edit"
+    t.boolean  "can_delete"
     t.boolean  "can_add_organizer"
   end
 
@@ -368,10 +371,12 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "created_at"
     t.datetime "modified_at"
     t.datetime "deleted_at"
-    t.string   "type",                      limit: 255
-    t.string   "value",                     limit: 255
+    t.string   "organizer_type",            limit: 255
+    t.string   "name",                      limit: 255
     t.string   "label",                     limit: 255
+    t.boolean  "default_can_read",                      default: true
     t.boolean  "default_can_edit",                      default: true
+    t.boolean  "default_can_delete",                    default: true
     t.boolean  "default_can_add_organizer",             default: true
   end
 

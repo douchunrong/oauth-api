@@ -24,6 +24,35 @@ module Models
         where(deleted_at: nil, accepted_at: nil, rejected_at: nil)
       end
 
+      cattr_accessor :token_name
+
+      self.token_name = 'token'
+
+      # @todo: move to a module
+      before_create :create_unique_identifier
+      def create_unique_identifier
+        return unless self.class.token_name.present?
+
+        # generate 10 random strings
+        tokens = (1..10).to_a.map do
+          t = (1..8).to_a.map { (65 + (rand() * 26).floor).chr }.join
+
+          "SELECT CONVERT('#{ t }' using latin1) as token"
+        end
+
+        result = ActiveRecord::Base.connection.execute(%Q{
+          SELECT token FROM ( #{ tokens.join(' UNION ') } ) as tokens
+          WHERE NOT EXISTS (
+            SELECT 1
+            FROM `#{ self.class.table_name }`
+            WHERE `#{ self.class.token_name }` = tokens.token
+          )
+          LIMIT 1;
+        })
+
+        self.send :"#{ self.class.token_name }=", result.first.try(:first)
+      end
+
       def resource
         raise NotImplementedError
       end
@@ -32,10 +61,45 @@ module Models
         self.class.name.scan(/Models::V1::(.*?)Invite/).last.first
       end
 
+      def createable_by?(user, params)
+        return false if user.nil?
+
+        return true if super
+
+        return true if user_id == user.id || user_email == user.email
+
+        token == params[:token] &&
+          (pass_phrase.nil? || pass_phrase == params[:pass_phrase])
+      end
+
+      def readable_by?(user)
+        return false if user.nil?
+
+        super || user_id == user.id || user_email == user.email
+      end
+
+      def updateable_by?(user, params)
+        return false if user.nil?
+
+        return true if super
+
+        return true if user_id == user.id || user_email == user.email
+
+        token == params[:token] &&
+          (pass_phrase.nil? || pass_phrase == params[:pass_phrase])
+      end
+
+      def deletable_by?(user)
+        return false if user.nil?
+
+        super || user_id == user.id || user_email == user.email
+      end
+
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 
         (options[:methods] ||= []) << :invite_type
+        (options[:except] ||= []) << :token << :pass_phrase
 
         super(options)
       end

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   use_doorkeeper
 
   RESOURCE_ROUTES = %i(index create show update destroy).freeze
+  READ_ONLY_RESOURCE_ROUTES = %i(index show).freeze
 
   namespace :controllers, path: '/' do # , constraints: { subdomain: 'api' } if production?
     namespace :v1, path: 'v1' do
@@ -12,9 +13,11 @@ Rails.application.routes.draw do
       resources :division, only: RESOURCE_ROUTES
       resources :groups, only: RESOURCE_ROUTES
       resources :invites, only: RESOURCE_ROUTES
-      resources :organization, only: RESOURCE_ROUTES
+      resources :organizations, only: RESOURCE_ROUTES
+      resources :organizer_types, only: READ_ONLY_RESOURCE_ROUTES
+      resources :profile_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
       resources :places, only: RESOURCE_ROUTES
-      resources :profiles, only: RESOURCE_ROUTES
+      resources :profiles, only: RESOURCE_ROUTES # @tood: no update
       resources :sports, only: RESOURCE_ROUTES
       resources :users, only: [:new, :create, :show]
     end
