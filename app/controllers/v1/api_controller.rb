@@ -13,11 +13,9 @@ module Controllers
       def index
         options = {}
 
-        if params[:include].present?
-          options[:include] = params[:include].split(',').map(&:to_sym)
-        end
+        includes = options[:include] = permittable_list_includes
 
-        render(json: list(params).map { |r| r.as_json(options) })
+        render(json: list(params, includes).as_json(options))
       end
 
       def create
@@ -38,13 +36,19 @@ module Controllers
       end
 
       def show
-        resource = self.class.model_class.find(params[:id])
+        options = {}
+
+        includes = options[:include] = permittable_read_includes(params[:id])
+
+        resource = self.class.model_class
+          .tap { |c| c.includes(includes) unless includes.nil? }
+          .find(params[:id])
 
         unless resource.readable_by?(current_user)
           raise PermissionError, :read
         end
 
-        render(json: resource.as_json)
+        render(json: resource.as_json(options))
       rescue ActiveRecord::RecordNotFound => e
         not_found!(e.message)
       rescue PermissionError => e
@@ -93,10 +97,20 @@ module Controllers
           .permit(self.class.model_class.column_names)
       end
 
-      def list(params)
+      def permittable_list_includes
+        []
+      end
+
+      def permittable_read_includes(resource_id)
+        []
+      end
+
+      def list(params, includes = nil)
         query = params[:admin] == 'true' && current_user.admin? ?
           self.class.model_class.all :
           self.class.model_class.accessible_to(current_user)
+
+        query.includes(includes) unless includes.nil?
 
         query
           .tap do |query|

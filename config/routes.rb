@@ -1,11 +1,11 @@
 app_root = File.dirname(File.absolute_path(__FILE__))
 Dir.glob("#{app_root}/../app/controllers/**/*_controller.rb", &method(:require))
 
+RESOURCE_ROUTES = %i(index create show update destroy).freeze
+READ_ONLY_RESOURCE_ROUTES = %i(index show).freeze
+
 Rails.application.routes.draw do
   use_doorkeeper
-
-  RESOURCE_ROUTES = %i(index create show update destroy).freeze
-  READ_ONLY_RESOURCE_ROUTES = %i(index show).freeze
 
   namespace :controllers, path: '/' do # , constraints: { subdomain: 'api' } if production?
     namespace :v1, path: 'v1' do

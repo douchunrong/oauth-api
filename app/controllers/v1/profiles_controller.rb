@@ -38,6 +38,34 @@ module Controllers
         super.reject { |p| p.user_id == current_user_id }
       end
 
+      protected
+
+      PERMITTABLE_INCLUDES = %i(
+        not_really_sure
+      ).freeze
+
+      ADMIN_PERMITTABLE_INCLUDES = %i(
+        profile_data
+      ).freeze
+
+      def permittable_list_includes
+        includes = params[:include].split(',').map(&:to_sym)
+
+        includes & PERMITTABLE_INCLUDES
+      end
+
+      def permittable_read_includes(resource_id)
+        includes = params[:include].split(',').map(&:to_sym)
+
+        # @todo: you *could* do a check to see whether this is even necessary
+        permittables = Models::V1::ProfileOrganizer.where(
+          organizer_id: current_user_id,
+          place_id: resource_id
+        ).exists? ? ADMIN_PERMITTABLE_INCLUDES : PERMITTABLE_INCLUDES
+
+        includes & permittables
+      end
+
       private
 
       def append_title_filter!(query, name)

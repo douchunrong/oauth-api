@@ -27,6 +27,27 @@ module Models
       has_many :external_sources, class_name: 'Models::V1::PlaceExternalSource'
       has_many :waivers, class_name: 'Models::V1::PlaceWavier'
 
+      # nothing special here
+      # def createable_by?(user, params)
+      #   super
+      # end
+
+      def readable_by?(user)
+        participant = false # @todo
+
+        !private? || super || participant
+      end
+
+      # nothing special here
+      # def updateable_by?(user, params)
+      #   super
+      # end
+
+      # nothing special here
+      # def deletable_by?(user)
+      #   super
+      # end
+
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 

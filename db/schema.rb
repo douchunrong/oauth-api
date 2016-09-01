@@ -272,6 +272,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "accepted_at"
     t.datetime "rejected_at"
     t.string   "type",                     limit: 255
+    t.integer  "association_id",           limit: 8
     t.integer  "division_id",              limit: 8
     t.integer  "place_id",                 limit: 8
     t.integer  "organization_id",          limit: 8
@@ -304,6 +305,13 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.string   "migration_city",           limit: 1024
     t.string   "migration_state",          limit: 1024
     t.string   "migration_zip",            limit: 1024
+    t.string   "type",                     limit: 255
+    t.integer  "association_id",           limit: 8
+    t.integer  "division_id",              limit: 8
+    t.integer  "place_id",                 limit: 8
+    t.integer  "organization_id",          limit: 8
+    t.integer  "profile_id",               limit: 8
+    t.integer  "group_id",                 limit: 8
   end
 
   add_index "v1_location", ["created_by_id"], name: "created_by_id", using: :btree

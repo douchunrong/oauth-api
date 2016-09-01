@@ -29,12 +29,10 @@ module Models
           organizers.any? { |o| o.can_edit? && o.organizer_id = user.id }
       end
 
-      def deletable_by?(user)
-        return false if user.nil?
-
-        super ||
-          organizers.any? { |o| o.can_delete? && o.organizer_id = user.id }
-      end
+      # nothing special here
+      # def deletable_by?(user)
+      #   super
+      # end
     end
   end
 end
