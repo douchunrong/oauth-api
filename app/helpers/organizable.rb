@@ -8,7 +8,7 @@ module Models
         where(id: Organizer.resources_for_user(self, user))
       end
 
-      def createable_by?(user, params)
+      def createable_by?(user, params = {})
         return false if user.nil?
 
         super ||
@@ -22,7 +22,7 @@ module Models
           organizers.any? { |o| o.can_read? && o.organizer_id = user.id }
       end
 
-      def updateable_by?(user, params)
+      def updateable_by?(user, params = {})
         return false if user.nil?
 
         super ||

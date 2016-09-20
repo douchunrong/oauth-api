@@ -6,16 +6,32 @@ module Controllers
   module V1
     class OrganizerTypesController < ApiController
       self.model_class = Models::V1::OrganizerType
-    end
 
-    class ProfileOrganizerTypesController < ApiController
-      self.model_class = Models::V1::OrganizerType
-
-      def list(params)
+      def list(params, includes = nil)
         super
-          .where(organizer_type: Models::V1::ProfileOrganizer.name)
+          .tap { |q| q.includes(includes) unless includes.nil? }
+          .where(organizer_type: self.class.organizer_class.name)
           .where.not(label: nil)
       end
+
+      class << self
+        attr_accessor :organizer_class
+      end
+    end
+
+    class ProfileOrganizerTypesController < OrganizerTypesController
+      self.model_class = Models::V1::OrganizerType
+      self.organizer_class = Models::V1::ProfileOrganizer
+    end
+
+    class PlaceOrganizerTypesController < OrganizerTypesController
+      self.model_class = Models::V1::OrganizerType
+      self.organizer_class = Models::V1::PlaceOrganizer
+    end
+
+    class GroupOrganizerTypesController < OrganizerTypesController
+      self.model_class = Models::V1::OrganizerType
+      self.organizer_class = Models::V1::GroupOrganizer
     end
   end
 end

@@ -80,14 +80,33 @@ module Models
       end
 
       def serialized_scoped_data(scope_names = nil)
-        data_map = profile_data.group_by(&:profile_data_type_id)
+        self.class.serialized_scoped_data(profile_data, scope_names)
+      end
 
-        # todo: cache this!
-        scopes = Scope.includes(:profile_data_types).entries
-        scopes.select { |s| scope_names.include?(s) } unless scope_names.nil?
+      class << self
+        def with_profile_data(val)
+          ProfileDatum
+            .select(:profile_id)
+            .where('value LIKE ?', "%#{ val }%")
+        end
 
-        scopes.map do |scope|
-          types_hash = scope.profile_data_types.map do |type|
+        # take all profile data and group it by scope and type
+        # then if scope_names is nil, fill in any missing scopes
+        # if not empty, return only the specified scopes
+        # if empty (but not null), do not fill in the missing scopes
+        def serialized_scoped_data(profile_data, scope_names = nil)
+          data_map = profile_data.group_by(&:profile_data_type_id)
+          only_available_data = !scope_names.nil? && scope_names.empty?
+
+          # todo: cache this!
+          scopes = Scope.includes(:profile_data_types).entries
+          if scope_names.present?
+            # would #select! modify the cached query above?
+            scopes = scopes.select { |s| scope_names.include?(s.name) }
+          end
+
+          scopes.map do |scope|
+            types_hash = scope.profile_data_types.map do |type|
               if data_map.key?(type.id)
                 type_data = type.singular ?
                   data_map[type.id].first.data_value.as_json :
@@ -99,17 +118,13 @@ module Models
               }).merge(data: type_data)
             end
 
-          scope.as_json({
-            only: %i(name description label).freeze
-          }).merge(types: types_hash)
-        end
-      end
+            next if only_available_data && types_hash.none? { |h| h[:data].present? }
 
-      class << self
-        def with_profile_data(val)
-          ProfileDatum
-            .select(:profile_id)
-            .where('value LIKE ?', "%#{ val }%")
+            scope.as_json({
+              only: %i(name description label).freeze
+            }).merge(types: types_hash)
+          end
+          .compact # will only apply in "only_available_types" scenarios
         end
       end
     end

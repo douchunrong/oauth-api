@@ -28,7 +28,7 @@ module Models
       has_many :waivers, class_name: 'Models::V1::PlaceWavier'
 
       # nothing special here
-      # def createable_by?(user, params)
+      # def createable_by?(user, params = {})
       #   super
       # end
 
@@ -39,7 +39,7 @@ module Models
       end
 
       # nothing special here
-      # def updateable_by?(user, params)
+      # def updateable_by?(user, params = {})
       #   super
       # end
 

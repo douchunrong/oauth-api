@@ -33,7 +33,7 @@ module Controllers
 
       private
 
-      def list(params)
+      def list(params, includes = nil)
         super.tap do |models|
           resources = models.map(&:resource)
 

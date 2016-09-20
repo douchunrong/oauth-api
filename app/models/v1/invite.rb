@@ -61,7 +61,7 @@ module Models
         self.class.name.scan(/Models::V1::(.*?)Invite/).last.first
       end
 
-      def createable_by?(user, params)
+      def createable_by?(user, params = {})
         return false if user.nil?
 
         return true if super
@@ -78,7 +78,7 @@ module Models
         super || user_id == user.id || user_email == user.email
       end
 
-      def updateable_by?(user, params)
+      def updateable_by?(user, params = {})
         return false if user.nil?
 
         return true if super

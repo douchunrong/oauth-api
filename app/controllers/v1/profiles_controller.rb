@@ -26,10 +26,14 @@ module Controllers
         # create profile data if applicable
         if params[:profile_data]
           resource.profile_data = Models::V1::ProfileDatum
-            .from_scoped_hash(params[:profile_data], resource, current_user)
+            .from_request_hashes(params[:profile_data], resource, current_user)
         end
 
-        render(json: resource.as_json(include: :profile_data), status: 201)
+        render \
+          json: Service::V1::UserResourceView
+            .factory(resource, current_user)
+            .as_json(include: :profile_data),
+          status: 201
       rescue ActiveRecord::RecordInvalid => e
         halt(401, e.errors.to_json)
       end
@@ -41,13 +45,16 @@ module Controllers
       protected
 
       PERMITTABLE_INCLUDES = %i(
-        not_really_sure
+        profile_data
       ).freeze
 
       ADMIN_PERMITTABLE_INCLUDES = %i(
         profile_data
       ).freeze
 
+      # this is going to be difficult.
+      # for parents, list app profiles with all data
+      # for place/group organizers, list all data to which you have access
       def permittable_list_includes
         includes = params[:include].split(',').map(&:to_sym)
 

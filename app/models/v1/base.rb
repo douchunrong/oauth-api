@@ -4,7 +4,7 @@ module Models
   module V1
     module Base
       module InstanceMethods
-        def createable_by?(user, params)
+        def createable_by?(user, params = {})
           user.present?
         end
 
@@ -14,7 +14,7 @@ module Models
           created_by_id == user.id
         end
 
-        def updateable_by?(user, params)
+        def updateable_by?(user, params = {})
           return false if user.nil?
 
           created_by_id == user.id
@@ -48,7 +48,8 @@ module Models
         # base.attr_accessible :modified_at
         # base.attr_accessible :deleted_at
 
-        base.send :default_scope, ->{ base.where(deleted_at: nil) }
+        base.send :acts_as_paranoid
+        # base.send :default_scope, ->{ base.where(deleted_at: nil) }
       end
 
       def timestamp_attributes_for_update

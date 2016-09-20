@@ -16,8 +16,12 @@ Rails.application.routes.draw do
       resources :organizations, only: RESOURCE_ROUTES
       resources :organizer_types, only: READ_ONLY_RESOURCE_ROUTES
       resources :profile_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
+      resources :place_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
+      resources :group_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
       resources :places, only: RESOURCE_ROUTES
-      resources :profiles, only: RESOURCE_ROUTES # @tood: no update
+      resources :profiles, only: RESOURCE_ROUTES do # @tood: no update
+        resources :profile_data, only: RESOURCE_ROUTES
+      end
       resources :sports, only: RESOURCE_ROUTES
       resources :users, only: [:new, :create, :show]
     end

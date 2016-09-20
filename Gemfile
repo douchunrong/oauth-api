@@ -16,8 +16,10 @@ gem 'mysql2'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
+gem 'paranoia', '~> 2.0'
+
 # WordPress Migration
-gem 'ruby-wpdb'
+# gem 'ruby-wpdb'
 gem 'phpass-ruby'
 gem 'php_serialize'
 

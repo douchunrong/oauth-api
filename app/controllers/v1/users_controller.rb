@@ -13,7 +13,10 @@ module Controllers
       def show
         resource = Models::V1::User.find(params[:id])
 
-        render(json: resource)
+        render \
+          json: Service::V1::UserResourceView
+            .factory(resource, current_user)
+            .as_json
       end
 
       private

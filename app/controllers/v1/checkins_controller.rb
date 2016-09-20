@@ -19,7 +19,10 @@ module Controllers
       def show
         resource = Models::V1::Checkin.find(params[:id])
 
-        render(json: resource.as_json)
+        render \
+          json: Service::V1::UserResourceView
+            .factory(resource, current_user)
+            .as_json
       end
 
       def update

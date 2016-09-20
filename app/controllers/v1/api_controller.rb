@@ -1,4 +1,5 @@
 require_relative '../application_controller'
+require_relative '../../service/v1/permissioned_resource'
 
 module Controllers
   module V1
@@ -30,9 +31,14 @@ module Controllers
 
         resource.save!
 
-        render(json: resource.as_json, status: 201)
+        render \
+          json: Service::V1::UserResourceView.factory(resource, current_user)
+            .as_json(options),
+          status: 201
+      rescue ActionController::ParameterMissing => e
+        validation_error!(e.message)
       rescue ActiveRecord::RecordInvalid => e
-        halt(401, e.errors.to_json)
+        halt(400, e.errors.to_json)
       end
 
       def show
@@ -48,7 +54,9 @@ module Controllers
           raise PermissionError, :read
         end
 
-        render(json: resource.as_json(options))
+        render \
+          json: Service::V1::UserResourceView.factory(resource, current_user)
+            .as_json(options)
       rescue ActiveRecord::RecordNotFound => e
         not_found!(e.message)
       rescue PermissionError => e
@@ -64,7 +72,10 @@ module Controllers
 
         resource.update_attributes(resource_params)
 
-        render(json: resource.as_json)
+        render \
+          json: Service::V1::UserResourceView
+            .factory(resource, current_user)
+            .as_json
       rescue ActiveRecord::RecordNotFound => e
         not_found!(e.message)
       rescue ActiveModel::ForbiddenAttributesError => e
@@ -93,7 +104,7 @@ module Controllers
 
       def resource_params
         params
-          .require(:user)
+          .require(:user) # why user??
           .permit(self.class.model_class.column_names)
       end
 
@@ -117,23 +128,17 @@ module Controllers
             query.limit!(params[:limit] || 10)
             query.offset!(params[:offset] || 0)
 
-            if params[:include].present?
-              query.includes!(params[:include].split(','))
-            end
-
             if params[:name].present?
               append_title_filter!(query, params[:name])
             end
           end
       end
 
-      private
-
       def fail!(messages, status)
         render(json: { messages: messages }, status: status)
       end
 
-      def not_found!
+      def not_found!(message)
         fail!([message], 404)
       end
 

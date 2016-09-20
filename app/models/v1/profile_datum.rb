@@ -26,6 +26,9 @@ module Models
         _data_value
       end
 
+      # @todo: serializable_hash with core properties
+      # and similar for subclasses appending only relevant properties
+
       protected
 
       def _data_value
@@ -33,40 +36,67 @@ module Models
       end
 
       class << self
-        def factory(type, attributes)
-          klass = descendants.find { |c| c.name == type } || self
+        def class_factory(type)
+          descendants.find { |c| c.name == type } || self
+        end
 
-          klass.create(attributes)
+        def factory(profile, created_by, type, attributes)
+          return if type.nil?
+
+          klass = class_factory(type.data_type)
+
+          klass.transaction do
+            if type.singular?
+              klass.destroy_all(profile: profile, profile_data_type: type)
+            end
+
+            attributes =
+              ActionController::Parameters.new(attributes)
+                .permit(klass.column_names)
+
+            klass.new(attributes).tap do |instance|
+              instance.profile_data_type = type
+              instance.profile = profile
+              instance.created_by = created_by
+
+              instance.save!
+            end
+          end
         end
 
         # {
-        #   "scope.name" => {
-        #     "type.name" => value
-        #   }
+        #   "scope" => <scope_name>,
+        #   "type" => <type_name>,
+        #   "value" => <value>
         # }
-        # caveat: despite some types allowing multiple values, this
-        # method will only accept single values
-        def from_scoped_hash(hash, profile = nil, created_by = nil)
+        def from_request_hashes(hashes, profile = nil, created_by = nil)
           types = ProfileDataType.includes(:scope).all
 
-          hash.flat_map do |scope_name, typed_data|
-            typed_data.map do |type_name, value|
-              type = types
-                .find { |t| t.scope.name == scope_name && t.name == type_name }
+          hashes.map { |h| from_request_hash(types, h, profile, created_by) }
+        end
 
-              factory(type.data_type, {
-                created_by: created_by,
-                profile: profile,
-                profile_data_type: type,
-                value: value
-              })
-            end
-          end
+        private
+
+        def from_request_hash(types, hash, profile, created_by)
+          hash = hash.dup
+          scope_name = hash.delete(:scope)
+          type_name = hash.delete(:profile_data_type)
+
+          type = types
+            .find { |t| t.scope.name == scope_name && t.name == type_name }
+
+          factory(profile, created_by, type, hash)
+        rescue ActiveRecord::RecordInvalid => e
+          logger.warn "Failed to create #{ name }"
+          logger.warn e.message
+
+          e.record.as_json.tap { |r| r[:error] = e.message }
         end
       end
     end
 
     class StringProfileDatum < ProfileDatum
+      validates :value, presence: true
     end
 
     class DateProfileDatum < ProfileDatum
@@ -81,6 +111,8 @@ module Models
     # @todo: remove?
     class AttachmentProfileDatum < ProfileDatum
       belongs_to :attachment
+
+      validates :attachment_id, presence: true
 
       protected
 
@@ -101,6 +133,8 @@ module Models
     class ContactProfileDatum < ProfileDatum
       belongs_to :contact
 
+      validates :contact_id, presence: true
+
       protected
 
       def _data_value
@@ -112,6 +146,8 @@ module Models
     class InsuranceProfileDatum < ProfileDatum
       belongs_to :insurance
 
+      validates :insurance_id, presence: true
+
       protected
 
       def _data_value
@@ -122,6 +158,8 @@ module Models
     # @todo: remove?
     class ProfileLocationProfileDatum < ProfileDatum
       belongs_to :location
+
+      validates :location_id, presence: true
 
       protected
 
