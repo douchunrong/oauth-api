@@ -49,6 +49,7 @@ module Controllers
       ).freeze
 
       ADMIN_PERMITTABLE_INCLUDES = %i(
+        organizers
         profile_data
       ).freeze
 
@@ -67,7 +68,7 @@ module Controllers
         # @todo: you *could* do a check to see whether this is even necessary
         permittables = Models::V1::ProfileOrganizer.where(
           organizer_id: current_user_id,
-          place_id: resource_id
+          profile_id: resource_id
         ).exists? ? ADMIN_PERMITTABLE_INCLUDES : PERMITTABLE_INCLUDES
 
         includes & permittables

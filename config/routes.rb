@@ -10,19 +10,37 @@ Rails.application.routes.draw do
   namespace :controllers, path: '/' do # , constraints: { subdomain: 'api' } if production?
     namespace :v1, path: 'v1' do
       resources :checkins, only: RESOURCE_ROUTES
+
       resources :division, only: RESOURCE_ROUTES
-      resources :groups, only: RESOURCE_ROUTES
+
+      resources :groups, only: RESOURCE_ROUTES do
+        resources :organizers, only: RESOURCE_ROUTES
+      end
+
       resources :invites, only: RESOURCE_ROUTES
+
       resources :organizations, only: RESOURCE_ROUTES
+
       resources :organizer_types, only: READ_ONLY_RESOURCE_ROUTES
+
       resources :profile_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
+
       resources :place_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
+
       resources :group_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
-      resources :places, only: RESOURCE_ROUTES
+
+      resources :places, only: RESOURCE_ROUTES do
+        resources :organizers, only: RESOURCE_ROUTES
+      end
+
       resources :profiles, only: RESOURCE_ROUTES do # @tood: no update
+        resources :organizers, only: RESOURCE_ROUTES
+
         resources :profile_data, only: RESOURCE_ROUTES
       end
+
       resources :sports, only: RESOURCE_ROUTES
+
       resources :users, only: [:new, :create, :show]
     end
   end

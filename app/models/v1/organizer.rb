@@ -19,6 +19,28 @@ module Models
 
       # attr_accessible :can_edit, :can_add_organizer
 
+      default_scope { includes(:organizer_type) }
+
+      def serializable_hash(options = {})
+        options ||= {}
+
+        options[:include] = Array(options[:include])
+        options[:include] << :organizer_type
+
+        # @todo: optimization opportunity: OrganizerType.entries is likely
+        # cached, so no need to fetch for each here
+        super(options).tap do |hash|
+          hash[:organizer] = organizer.as_json({
+            include: {
+              profile: {
+                include: :profile_data,
+                scopes: ['profile.identification']
+              }
+            }
+          })
+        end
+      end
+
       class << self
         protected
 

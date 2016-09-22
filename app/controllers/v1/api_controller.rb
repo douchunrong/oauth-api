@@ -1,5 +1,5 @@
 require_relative '../application_controller'
-require_relative '../../service/v1/permissioned_resource'
+require_relative '../../service/v1/user_resource_view'
 
 module Controllers
   module V1

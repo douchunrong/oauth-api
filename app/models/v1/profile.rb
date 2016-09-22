@@ -70,11 +70,16 @@ module Models
 
       # accepts standard otions as well as one special option: scopes
       def serializable_hash(options = {})
-        options ||= {}
+        options = standardize_serialization_options(options)
 
-        return super unless [options[:include]].flatten.include?(:profile_data)
+        return super unless options.key?(:include)
 
-        super(except: :profile_data).tap do |hash|
+        # we override the rendering of profile_data below
+        profile_data_options = options[:include].delete(:profile_data)
+
+        return super if profile_data_options.nil?
+
+        super(options).tap do |hash|
           hash[:profile_data] = serialized_scoped_data(options[:scopes])
         end
       end

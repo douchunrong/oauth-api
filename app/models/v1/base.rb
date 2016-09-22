@@ -34,6 +34,31 @@ module Models
 
           super(options.merge(except: excepts))
         end
+
+        protected
+
+        def standardize_serialization_options(options)
+          options = options.try(:clone) || {}
+
+          return options unless options.key?(:include)
+          return options if options[:include].is_a?(Hash)
+
+          options[:include] =
+            Hash[Array(options[:include]).map { |i| [i, {}] }]
+
+          options
+        end
+
+        def included_serialization_options(includes, key)
+          # could be a hash
+          return includes[key] if includes.is_a?(Hash)
+          # could be an array
+          return {} if includes.is_a?(Array) && includes.include?(key)
+          # could be a symbol
+          return {} if includes == key
+
+          nil
+        end
       end
 
       def self.extended(base)
