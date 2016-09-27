@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       resources :division, only: RESOURCE_ROUTES
 
       resources :groups, only: RESOURCE_ROUTES do
-        resources :organizers, only: RESOURCE_ROUTES
+        resources :organizers, only: RESOURCE_ROUTES, controller: 'group_organizers'
       end
 
       resources :invites, only: RESOURCE_ROUTES
@@ -30,11 +30,11 @@ Rails.application.routes.draw do
       resources :group_organizer_types, only: READ_ONLY_RESOURCE_ROUTES
 
       resources :places, only: RESOURCE_ROUTES do
-        resources :organizers, only: RESOURCE_ROUTES
+        resources :organizers, only: RESOURCE_ROUTES, controller: 'place_organizers'
       end
 
       resources :profiles, only: RESOURCE_ROUTES do # @tood: no update
-        resources :organizers, only: RESOURCE_ROUTES
+        resources :organizers, only: RESOURCE_ROUTES, controller: 'profile_organizers'
 
         resources :profile_data, only: RESOURCE_ROUTES
       end

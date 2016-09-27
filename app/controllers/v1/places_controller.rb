@@ -6,6 +6,7 @@ module Controllers
   module V1
     class PlacesController < ApiController
       self.model_class = Models::V1::Place
+      self.resource_param = :place
 
       protected
 

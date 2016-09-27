@@ -9,6 +9,7 @@ module Controllers
   module V1
     class ProfilesController < ApiController
       self.model_class = Models::V1::Profile
+      self.resource_param = :profile
 
       # Profiles are collections of other data and have no properties of their own!
       def create
@@ -49,6 +50,7 @@ module Controllers
       ).freeze
 
       ADMIN_PERMITTABLE_INCLUDES = %i(
+        invites
         organizers
         profile_data
       ).freeze

@@ -20,6 +20,16 @@ module Models
         inverse_of: :invitations
       }
 
+      validates :user_email, {
+        presence: true,
+        unless: Proc.new { |a| a.user_id.present? }
+      }
+
+      validates :user_id, {
+        presence: true,
+        unless: Proc.new { |a| a.user_email.present? }
+      }
+
       default_scope do
         where(deleted_at: nil, accepted_at: nil, rejected_at: nil)
       end
@@ -105,6 +115,15 @@ module Models
       end
 
       class << self
+        def class_factory(resource_class)
+          invite_class = "#{ resource_class.name }Invite"
+
+          klass = descendants
+            .find { |c| c.name == resource_class.name || c.name == invite_class }
+
+          klass || self
+        end
+
         def accessible_to(user)
           where('user_id = ? OR user_email = ?', user.id, user.email)
         end
@@ -119,7 +138,7 @@ module Models
     #   def serializable_hash(options = {})
     #     options = options.try(:clone) || {}
 
-    #     unless [options[:exclude]].flatten.include?(:association)
+    #     unless Array(options[:exclude]).include?(:association)
     #       (options[:include] ||= []) << :association
     #     end
 
@@ -135,7 +154,7 @@ module Models
     #   def serializable_hash(options = {})
     #     options = options.try(:clone) || {}
 
-    #     unless [options[:exclude]].flatten.include?(:contact)
+    #     unless Array(options[:exclude]).include?(:contact)
     #       (options[:include] ||= []) << :contact
     #     end
 
@@ -146,12 +165,14 @@ module Models
     class DivisionInvite < Invite
       belongs_to :division
 
+      validates :division_id, presence: true
+
       alias_method :resource, :division
 
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 
-        unless [options[:exclude]].flatten.include?(:division)
+        unless Array(options[:exclude]).include?(:division)
           (options[:include] ||= []) << :division
         end
 
@@ -162,12 +183,14 @@ module Models
     class GroupInvite < Invite
       belongs_to :group
 
+      validates :group_id, presence: true
+
       alias_method :resource, :group
 
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 
-        unless [options[:exclude]].flatten.include?(:group)
+        unless Array(options[:exclude]).include?(:group)
           (options[:include] ||= []) << :group
         end
 
@@ -178,12 +201,14 @@ module Models
     class OrganizationInvite < Invite
       belongs_to :organization
 
+      validates :organization_id, presence: true
+
       alias_method :resource, :organization
 
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 
-        unless [options[:exclude]].flatten.include?(:organization)
+        unless Array(options[:exclude]).include?(:organization)
           (options[:include] ||= []) << :organization
         end
 
@@ -194,12 +219,14 @@ module Models
     class PlaceInvite < Invite
       belongs_to :place
 
+      validates :place_id, presence: true
+
       alias_method :resource, :place
 
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 
-        unless [options[:exclude]].flatten.include?(:place)
+        unless Array(options[:exclude]).include?(:place)
           (options[:include] ||= []) << :place
         end
 
@@ -210,13 +237,95 @@ module Models
     class ProfileInvite < Invite
       belongs_to :profile
 
+      validates :profile_id, presence: true
+
       alias_method :resource, :profile
 
       def serializable_hash(options = {})
         options = options.try(:clone) || {}
 
-        unless [options[:exclude]].flatten.include?(:profile)
+        unless Array(options[:exclude]).include?(:profile)
           (options[:include] ||= []) << :profile
+        end
+
+        super(options)
+      end
+    end
+
+    class DivisionOrganizerInvite < DivisionInvite
+      belongs_to :organizer_type
+
+      validates :organizer_type_id, presence: true
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        unless Array(options[:exclude]).include?(:organizer_type)
+          (options[:include] ||= []) << :organizer_type
+        end
+
+        super(options)
+      end
+    end
+
+    class GroupOrganizerInvite < GroupInvite
+      belongs_to :organizer_type
+
+      validates :organizer_type_id, presence: true
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        unless Array(options[:exclude]).include?(:organizer_type)
+          (options[:include] ||= []) << :organizer_type
+        end
+
+        super(options)
+      end
+    end
+
+    class OrganizationOrganizerInvite < OrganizationInvite
+      belongs_to :organizer_type
+
+      validates :organizer_type_id, presence: true
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        unless Array(options[:exclude]).include?(:organizer_type)
+          (options[:include] ||= []) << :organizer_type
+        end
+
+        super(options)
+      end
+    end
+
+    class PlaceOrganizerInvite < PlaceInvite
+      belongs_to :organizer_type
+
+      validates :organizer_type_id, presence: true
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        unless Array(options[:exclude]).include?(:organizer_type)
+          (options[:include] ||= []) << :organizer_type
+        end
+
+        super(options)
+      end
+    end
+
+    class ProfileOrganizerInvite < ProfileInvite
+      belongs_to :organizer_type
+
+      validates :organizer_type_id, presence: true
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        unless Array(options[:exclude]).include?(:organizer_type)
+          (options[:include] ||= []) << :organizer_type
         end
 
         super(options)

@@ -46,6 +46,7 @@ module Models
           klass = class_factory(type.data_type)
 
           klass.transaction do
+            # @todo: nope. nope. nope.
             if type.singular?
               klass.destroy_all(profile: profile, profile_data_type: type)
             end

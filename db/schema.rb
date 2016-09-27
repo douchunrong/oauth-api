@@ -278,6 +278,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.integer  "organization_id",          limit: 8
     t.integer  "profile_id",               limit: 8
     t.integer  "group_id",                 limit: 8
+    t.integer  "organizer_type_id",        limit: 8
   end
 
   add_index "v1_invite", ["created_by_id"], name: "created_by_id", using: :btree
@@ -286,6 +287,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_index "v1_invite", ["organization_id"], name: "organization_id", using: :btree
   add_index "v1_invite", ["place_id"], name: "FK__v1_invite__v1_place", using: :btree
   add_index "v1_invite", ["profile_id"], name: "profile_id", using: :btree
+  add_index "v1_invite", ["organizer_type_id"], name: "organizer_type_id", using: :btree
 
   create_table "v1_location", force: :cascade do |t|
     t.integer  "created_by_id",            limit: 8,     null: false
@@ -690,6 +692,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_foreign_key "v1_invite", "v1_division", column: "division_id", name: "v1_invite_ibfk_2"
   add_foreign_key "v1_invite", "v1_group", column: "group_id", name: "FK__v1_invite__v1_group"
   add_foreign_key "v1_invite", "v1_organization", column: "organization_id", name: "v1_invite_ibfk_4"
+  add_foreign_key "v1_invite", "v1_organizer_type", column: "organizer_type_id", name: "v1_invite_ibfk_6"
   add_foreign_key "v1_invite", "v1_place", column: "place_id", name: "FK__v1_invite__v1_place"
   add_foreign_key "v1_invite", "v1_profile", column: "profile_id", name: "v1_invite_ibfk_5"
   add_foreign_key "v1_invite", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_invite_ibfk_1"

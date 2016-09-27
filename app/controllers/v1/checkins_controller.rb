@@ -6,6 +6,8 @@ require_relative 'api_controller'
 module Controllers
   module V1
     class CheckinsController < ApiController
+      self.resource_param = :checkin
+
       def index
         checkins = Models::V1::Checkin.accessible_to(current_user)
 

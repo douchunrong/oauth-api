@@ -31,6 +31,10 @@ module Controllers
 
         resource.save!
 
+        options = {
+          include: permittable_read_includes(params[:id])
+        }
+
         render \
           json: Service::V1::UserResourceView.factory(resource, current_user)
             .as_json(options),
@@ -104,7 +108,7 @@ module Controllers
 
       def resource_params
         params
-          .require(:user) # why user??
+          .require(self.class.resource_param)
           .permit(self.class.model_class.column_names)
       end
 
@@ -139,15 +143,15 @@ module Controllers
       end
 
       def not_found!(message)
-        fail!([message], 404)
+        fail!(Array(message), 404)
       end
 
       def permission_error!(message)
-        fail!([message], 403)
+        fail!(Array(message), 403)
       end
 
       def validation_error!(message)
-        fail!([message], 400)
+        fail!(Array(message), 400)
       end
 
       def append_title_filter!(query, name)
@@ -156,6 +160,7 @@ module Controllers
 
       class << self
         attr_reader :model_class
+        attr_accessor :resource_param
 
         def model_class=(klass)
           @model_class = klass

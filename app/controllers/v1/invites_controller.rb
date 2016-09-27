@@ -6,6 +6,7 @@ module Controllers
   module V1
     class InvitesController < ApiController
       self.model_class = Models::V1::Invite
+      self.resource_param = :invite
 
       ACCEPTED_STATE = 'accepted'.freeze
       REJECTED_STATE = 'rejected'.freeze

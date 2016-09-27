@@ -5,6 +5,7 @@ module Controllers
   module V1
     class GroupsController < ApiController
       self.model_class = Models::V1::Group
+      self.resource_param = :group
     end
   end
 end
