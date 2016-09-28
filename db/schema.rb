@@ -219,29 +219,6 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_index "v1_group", ["organization_id"], name: "organization_id", using: :btree
   add_index "v1_group", ["sport_id"], name: "sport_id", using: :btree
 
-  create_table "v1_group_membership", force: :cascade do |t|
-    t.integer  "created_by_id",  limit: 8,  null: false
-    t.datetime "created_at"
-    t.datetime "modified_at"
-    t.datetime "deleted_at"
-    t.integer  "group_id",       limit: 8
-    t.integer  "profile_id",     limit: 8
-    t.string   "uniform_number", limit: 15
-    t.string   "position",       limit: 63
-    t.integer  "accepted_by_id", limit: 8
-    t.datetime "accepted_at"
-    t.integer  "approved_by_id", limit: 8
-    t.datetime "approved_at"
-    t.integer  "migration_id",   limit: 8
-  end
-
-  add_index "v1_group_membership", ["accepted_by_id"], name: "accepted_by_id", using: :btree
-  add_index "v1_group_membership", ["approved_by_id"], name: "approved_by_id", using: :btree
-  add_index "v1_group_membership", ["created_by_id"], name: "created_by_id", using: :btree
-  add_index "v1_group_membership", ["group_id"], name: "FK__v1_team_membership__v1_group", using: :btree
-  add_index "v1_group_membership", ["migration_id"], name: "migration_id", using: :btree
-  add_index "v1_group_membership", ["profile_id"], name: "profile_id", using: :btree
-
   create_table "v1_insurance", force: :cascade do |t|
     t.integer  "created_by_id", limit: 8,   null: false
     t.datetime "created_at"
@@ -264,7 +241,6 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "modified_at"
     t.datetime "deleted_at"
     t.string   "user_email",               limit: 255
-    t.integer  "user_id",                  limit: 8
     t.string   "invited_by_friendly_name", limit: 255
     t.text     "message",                  limit: 65535
     t.string   "token",                    limit: 36,    null: false
@@ -272,12 +248,15 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "accepted_at"
     t.datetime "rejected_at"
     t.string   "type",                     limit: 255
-    t.integer  "association_id",           limit: 8
     t.integer  "division_id",              limit: 8
     t.integer  "place_id",                 limit: 8
     t.integer  "organization_id",          limit: 8
     t.integer  "profile_id",               limit: 8
     t.integer  "group_id",                 limit: 8
+    t.integer  "accepted_by_id",           limit: 8
+    t.integer  "rejected_by_id",           limit: 8
+    t.integer  "user_id",                  limit: 8
+    t.integer  "association_id",           limit: 8
     t.integer  "organizer_type_id",        limit: 8
   end
 
@@ -285,9 +264,9 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_index "v1_invite", ["division_id"], name: "division_id", using: :btree
   add_index "v1_invite", ["group_id"], name: "FK__v1_invite__v1_group", using: :btree
   add_index "v1_invite", ["organization_id"], name: "organization_id", using: :btree
+  add_index "v1_invite", ["organizer_type_id"], name: "organizer_type_id", using: :btree
   add_index "v1_invite", ["place_id"], name: "FK__v1_invite__v1_place", using: :btree
   add_index "v1_invite", ["profile_id"], name: "profile_id", using: :btree
-  add_index "v1_invite", ["organizer_type_id"], name: "organizer_type_id", using: :btree
 
   create_table "v1_location", force: :cascade do |t|
     t.integer  "created_by_id",            limit: 8,     null: false
@@ -316,8 +295,46 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.integer  "group_id",                 limit: 8
   end
 
+  add_index "v1_location", ["association_id"], name: "association_id", using: :btree
   add_index "v1_location", ["created_by_id"], name: "created_by_id", using: :btree
+  add_index "v1_location", ["division_id"], name: "division_id", using: :btree
+  add_index "v1_location", ["group_id"], name: "group_id", using: :btree
   add_index "v1_location", ["migration_id"], name: "migration_id", using: :btree
+  add_index "v1_location", ["organization_id"], name: "organization_id", using: :btree
+  add_index "v1_location", ["place_id"], name: "place_id", using: :btree
+  add_index "v1_location", ["profile_id"], name: "profile_id", using: :btree
+
+  create_table "v1_membership", force: :cascade do |t|
+    t.integer  "created_by_id",   limit: 8,   null: false
+    t.datetime "created_at"
+    t.datetime "modified_at"
+    t.datetime "deleted_at"
+    t.integer  "group_id",        limit: 8
+    t.integer  "profile_id",      limit: 8
+    t.string   "member_id",       limit: 32
+    t.string   "position",        limit: 63
+    t.integer  "accepted_by_id",  limit: 8
+    t.datetime "accepted_at"
+    t.integer  "approved_by_id",  limit: 8
+    t.datetime "approved_at"
+    t.integer  "migration_id",    limit: 8
+    t.string   "type",            limit: 255
+    t.integer  "association_id",  limit: 8
+    t.integer  "division_id",     limit: 8
+    t.integer  "place_id",        limit: 8
+    t.integer  "organization_id", limit: 8
+  end
+
+  add_index "v1_membership", ["accepted_by_id"], name: "accepted_by_id", using: :btree
+  add_index "v1_membership", ["approved_by_id"], name: "approved_by_id", using: :btree
+  add_index "v1_membership", ["association_id"], name: "association_id", using: :btree
+  add_index "v1_membership", ["created_by_id"], name: "created_by_id", using: :btree
+  add_index "v1_membership", ["division_id"], name: "division_id", using: :btree
+  add_index "v1_membership", ["group_id"], name: "FK__v1_team_membership__v1_group", using: :btree
+  add_index "v1_membership", ["migration_id"], name: "migration_id", using: :btree
+  add_index "v1_membership", ["organization_id"], name: "organization_id", using: :btree
+  add_index "v1_membership", ["place_id"], name: "place_id", using: :btree
+  add_index "v1_membership", ["profile_id"], name: "profile_id", using: :btree
 
   create_table "v1_organization", force: :cascade do |t|
     t.integer  "created_by_id", limit: 8,     null: false
@@ -360,10 +377,10 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.integer  "organization_id",   limit: 8
     t.integer  "profile_id",        limit: 8
     t.integer  "group_id",          limit: 8
-    t.boolean  "can_read"
     t.boolean  "can_edit"
-    t.boolean  "can_delete"
     t.boolean  "can_add_organizer"
+    t.boolean  "can_read"
+    t.boolean  "can_delete"
   end
 
   add_index "v1_organizer", ["association_id"], name: "association_id", using: :btree
@@ -384,14 +401,14 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.string   "organizer_type",            limit: 255
     t.string   "name",                      limit: 255
     t.string   "label",                     limit: 255
-    t.boolean  "default_can_read",                      default: true
     t.boolean  "default_can_edit",                      default: true
-    t.boolean  "default_can_delete",                    default: true
     t.boolean  "default_can_add_organizer",             default: true
+    t.boolean  "default_can_read"
+    t.boolean  "default_can_delete"
   end
 
   add_index "v1_organizer_type", ["created_by_id"], name: "created_by_id", using: :btree
-  add_index "v1_organizer_type", ["value", "type"], name: "value", unique: true, using: :btree
+  add_index "v1_organizer_type", ["name", "organizer_type"], name: "value", unique: true, using: :btree
 
   create_table "v1_place", force: :cascade do |t|
     t.integer  "created_by_id", limit: 8,     null: false
@@ -422,10 +439,10 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.datetime "created_at"
     t.datetime "modified_at"
     t.datetime "deleted_at"
-    t.integer  "migration_id",  limit: 8,  null: false
+    t.integer  "migration_id",  limit: 8
     t.string   "sport_id_code", limit: 32, null: false
     t.integer  "user_id",       limit: 8
-    t.string   "display_name",  limit: 64, null: false
+    t.string   "display_name",  limit: 64
   end
 
   add_index "v1_profile", ["created_by_id"], name: "created_by_id", using: :btree
@@ -683,11 +700,6 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_foreign_key "v1_group", "v1_organization", column: "organization_id", name: "v1_group_ibfk_3"
   add_foreign_key "v1_group", "v1_sport", column: "sport_id", name: "v1_group_ibfk_2"
   add_foreign_key "v1_group", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_group_ibfk_1"
-  add_foreign_key "v1_group_membership", "v1_group", column: "group_id", name: "FK__v1_team_membership__v1_group"
-  add_foreign_key "v1_group_membership", "v1_profile", column: "profile_id", name: "v1_group_membership_ibfk_3"
-  add_foreign_key "v1_group_membership", "wp_users", column: "accepted_by_id", primary_key: "ID", name: "v1_group_membership_ibfk_4"
-  add_foreign_key "v1_group_membership", "wp_users", column: "approved_by_id", primary_key: "ID", name: "v1_group_membership_ibfk_5"
-  add_foreign_key "v1_group_membership", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_group_membership_ibfk_1"
   add_foreign_key "v1_insurance", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_insurance_ibfk_1"
   add_foreign_key "v1_invite", "v1_division", column: "division_id", name: "v1_invite_ibfk_2"
   add_foreign_key "v1_invite", "v1_group", column: "group_id", name: "FK__v1_invite__v1_group"
@@ -696,7 +708,22 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_foreign_key "v1_invite", "v1_place", column: "place_id", name: "FK__v1_invite__v1_place"
   add_foreign_key "v1_invite", "v1_profile", column: "profile_id", name: "v1_invite_ibfk_5"
   add_foreign_key "v1_invite", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_invite_ibfk_1"
+  add_foreign_key "v1_location", "v1_association", column: "association_id", name: "v1_location_ibfk_2"
+  add_foreign_key "v1_location", "v1_division", column: "division_id", name: "v1_location_ibfk_3"
+  add_foreign_key "v1_location", "v1_group", column: "group_id", name: "v1_location_ibfk_7"
+  add_foreign_key "v1_location", "v1_organization", column: "organization_id", name: "v1_location_ibfk_5"
+  add_foreign_key "v1_location", "v1_place", column: "place_id", name: "v1_location_ibfk_4"
+  add_foreign_key "v1_location", "v1_profile", column: "profile_id", name: "v1_location_ibfk_6"
   add_foreign_key "v1_location", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_location_ibfk_1"
+  add_foreign_key "v1_membership", "v1_association", column: "association_id", name: "v1_membership_ibfk_6"
+  add_foreign_key "v1_membership", "v1_division", column: "division_id", name: "v1_membership_ibfk_7"
+  add_foreign_key "v1_membership", "v1_group", column: "group_id", name: "FK__v1_team_membership__v1_group"
+  add_foreign_key "v1_membership", "v1_organization", column: "organization_id", name: "v1_membership_ibfk_9"
+  add_foreign_key "v1_membership", "v1_place", column: "place_id", name: "v1_membership_ibfk_8"
+  add_foreign_key "v1_membership", "v1_profile", column: "profile_id", name: "v1_membership_ibfk_3"
+  add_foreign_key "v1_membership", "wp_users", column: "accepted_by_id", primary_key: "ID", name: "v1_membership_ibfk_4"
+  add_foreign_key "v1_membership", "wp_users", column: "approved_by_id", primary_key: "ID", name: "v1_membership_ibfk_5"
+  add_foreign_key "v1_membership", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_membership_ibfk_1"
   add_foreign_key "v1_organization", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_organization_ibfk_1"
   add_foreign_key "v1_organization_number", "v1_organization", column: "organization_id", name: "v1_organization_number_ibfk_3"
   add_foreign_key "v1_organization_number", "v1_profile", column: "profile_id", name: "v1_organization_number_ibfk_2"
