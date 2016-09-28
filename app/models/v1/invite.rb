@@ -22,12 +22,17 @@ module Models
 
       validates :user_email, {
         presence: true,
-        unless: Proc.new { |a| a.user_id.present? }
+        unless: Proc.new { |a| a.user_id.present? || a.pass_phrase.present? }
       }
 
       validates :user_id, {
         presence: true,
-        unless: Proc.new { |a| a.user_email.present? }
+        unless: Proc.new { |a| a.user_email.present? || a.pass_phrase.present? }
+      }
+
+      validates :pass_phrase, {
+        presence: true,
+        unless: Proc.new { |a| a.user_id.present? || a.user_email.present? }
       }
 
       default_scope do
