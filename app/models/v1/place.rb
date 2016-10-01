@@ -23,6 +23,7 @@ module Models
       has_many :participants, class_name: 'Models::V1::PlaceParticipant'
       has_many :invites, class_name: 'Models::V1::PlaceInvite'
       has_many :locations, class_name: 'Models::V1::PlaceLocation'
+      has_many :members, class_name: 'Models::V1::PlaceMembership'
       has_many :organizers, class_name: 'Models::V1::PlaceOrganizer'
       has_many :external_sources, class_name: 'Models::V1::PlaceExternalSource'
       has_many :waivers, class_name: 'Models::V1::PlaceWavier'

@@ -24,6 +24,7 @@ module Models
       has_many :external_sources, class_name: 'Models::V1::DivisionExternalSource'
       has_many :invites, class_name: 'Models::V1::DivisionInvite'
       has_many :locations, class_name: 'Models::V1::DivisionLocation'
+      has_many :members, class_name: 'Models::V1::DivisionMembership'
       has_many :organizers, class_name: 'Models::V1::DivisionOrganizer'
       has_many :groups
       has_many :waivers, class_name: 'Models::V1::DivisionWaiver'

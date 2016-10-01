@@ -24,6 +24,7 @@ module Models
       # has_many :external_source
       has_many :invites, class_name: 'Models::V1::OrganizationInvite'
       has_many :locations, class_name: 'Models::V1::OrganizationLocation'
+      has_many :members, class_name: 'Models::V1::OrganizationMembership'
       has_many :organization_numbers
       has_many :organizers, class_name: 'Models::V1::OrganizationOrganizer'
       has_many :resource_external_sources, class_name: 'Models::V1::OrganizationExternalSource'

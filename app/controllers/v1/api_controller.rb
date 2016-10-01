@@ -50,9 +50,7 @@ module Controllers
 
         includes = options[:include] = permittable_read_includes(params[:id])
 
-        resource = self.class.model_class
-          .tap { |c| c.includes(includes) unless includes.nil? }
-          .find(params[:id])
+        resource = find(params[:id], includes)
 
         unless resource.readable_by?(current_user)
           raise PermissionError, :read
@@ -74,7 +72,7 @@ module Controllers
           raise PermissionError, :update
         end
 
-        resource.update_attributes(resource_params)
+        update_resource!(resource, resource_params)
 
         render \
           json: Service::V1::UserResourceView
@@ -95,7 +93,7 @@ module Controllers
           raise PermissionError, :delete
         end
 
-        resource.destroy!
+        destroy_resource!(resource)
 
         head :no_content
       rescue ActiveRecord::RecordNotFound => e
@@ -127,15 +125,28 @@ module Controllers
 
         query.includes(includes) unless includes.nil?
 
-        query
-          .tap do |query|
-            query.limit!(params[:limit] || 10)
-            query.offset!(params[:offset] || 0)
+        query.limit!(params[:limit] || 10)
+        query.offset!(params[:offset] || 0)
 
-            if params[:name].present?
-              append_title_filter!(query, params[:name])
-            end
-          end
+        if params[:filter].present?
+          query = append_list_filters!(query, params[:filter])
+        end
+
+        query
+      end
+
+      def find(id, includes = nil)
+        self.class.model_class
+          .tap { |c| c.includes(includes) unless includes.nil? }
+          .find(params[:id])
+      end
+
+      def update_resource!(resource, params)
+        resource.update_attributes(params)
+      end
+
+      def destroy_resource!(resource)
+        resource.destroy!
       end
 
       def fail!(messages, status)
@@ -154,8 +165,13 @@ module Controllers
         fail!(Array(message), 400)
       end
 
-      def append_title_filter!(query, name)
-        query.where!('name like ?', "%#{ params[:name] }%")
+      # @todo: this feels dangerous. consider a stronger whitelist
+      def append_list_filters!(query, filters)
+        (self.class.model_class.columns & filters.keys)
+          .select { |k| filters[k].present? }
+          .each { |k| query.where!('#{ k } like ?', "%#{ filters[k] }%") }
+
+        query
       end
 
       class << self

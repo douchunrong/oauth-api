@@ -3,6 +3,7 @@ require_relative 'user'
 require_relative 'association'
 require_relative 'contact'
 require_relative 'division'
+require_relative 'membership'
 require_relative 'place'
 require_relative 'organization'
 require_relative 'profile'
@@ -90,7 +91,7 @@ module Models
       def readable_by?(user)
         return false if user.nil?
 
-        super || user_id == user.id || user_email == user.email
+        super || anonymous? || user_id == user.id || user_email == user.email
       end
 
       def updateable_by?(user, params = {})
@@ -117,6 +118,35 @@ module Models
         (options[:except] ||= []) << :token << :pass_phrase
 
         super(options)
+      end
+
+      def anonymous?
+        user_id.blank? && user_email.blank? && token.present?
+      end
+
+      def matches?(phrase)
+        pass_phrase.present? && pass_phrase == phrase
+      end
+
+      def dup_for_user!(user_id)
+        dup.tap do |invite|
+          invite.user_id = user_id
+          invite.token = nil
+          invite.pass_phrase = nil
+          invite.type =
+
+          invite.save!
+        end
+      end
+
+      def accept(accepted_by_id)
+        self.accepted_at = DateTime.now
+        self.accepted_by_id = accepted_by_id
+      end
+
+      def reject(rejected_by_id)
+        self.accepted_at = DateTime.now
+        self.rejected_by_id = rejected_by_id
       end
 
       class << self
@@ -254,6 +284,62 @@ module Models
         end
 
         super(options)
+      end
+    end
+
+    class DivisionMemberInvite < DivisionInvite
+      def accept(accepted_by_id)
+        super
+
+        DivisionMember.create!(
+          created_by_id: accepted_by_id,
+          accepted_by_id: accepted_by_id,
+          approved_by_id: created_by_id,
+          division_id: division_id,
+          user_id: accepted_by_id
+        )
+      end
+    end
+
+    class GroupMemberInvite < GroupInvite
+      def accept(accepted_by_id)
+        super
+
+        GroupMember.create!(
+          created_by_id: accepted_by_id,
+          accepted_by_id: accepted_by_id,
+          approved_by_id: created_by_id,
+          group_id: group_id,
+          user_id: accepted_by_id
+        )
+      end
+    end
+
+    class OrganizationMemberInvite < OrganizationInvite
+      def accept(accepted_by_id)
+        super
+
+        OrganizationMember.create!(
+          created_by_id: accepted_by_id,
+          accepted_by_id: accepted_by_id,
+          approved_by_id: created_by_id,
+          organization_id: division_id,
+          user_id: accepted_by_id
+        )
+      end
+    end
+
+    class PlaceMemberInvite < PlaceInvite
+      def accept(accepted_by_id)
+        super
+
+        PlaceMember.create!(
+          created_by_id: accepted_by_id,
+          accepted_by_id: accepted_by_id,
+          approved_by_id: created_by_id,
+          place_id: place_id,
+          user_id: accepted_by_id
+        )
       end
     end
 

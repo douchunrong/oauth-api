@@ -83,7 +83,7 @@ module Models
 
     # e.g., Host
     class PlaceOrganizer < Organizer
-      resource :event, 'Models::V1::Place'
+      resource :place, 'Models::V1::Place'
     end
 
     # e.g., President
@@ -98,7 +98,7 @@ module Models
 
     # e.g., Coach
     class GroupOrganizer < Organizer
-      resource :team, 'Models::V1::Group'
+      resource :group, 'Models::V1::Group'
     end
   end
 end

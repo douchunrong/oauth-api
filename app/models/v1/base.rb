@@ -99,6 +99,7 @@ module Models
 
       def inflate(models, key)
         key_id = :"#{ key }_id"
+        models = Array(models)
 
         ids = models.map { |m| m.try(key_id) }.uniq.compact
 

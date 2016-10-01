@@ -323,6 +323,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
     t.integer  "division_id",     limit: 8
     t.integer  "place_id",        limit: 8
     t.integer  "organization_id", limit: 8
+    t.integer  "user_id",         limit: 8
   end
 
   add_index "v1_membership", ["accepted_by_id"], name: "accepted_by_id", using: :btree
@@ -335,6 +336,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_index "v1_membership", ["organization_id"], name: "organization_id", using: :btree
   add_index "v1_membership", ["place_id"], name: "place_id", using: :btree
   add_index "v1_membership", ["profile_id"], name: "profile_id", using: :btree
+  add_index "v1_membership", ["user_id"], name: "user_id", using: :btree
 
   create_table "v1_organization", force: :cascade do |t|
     t.integer  "created_by_id", limit: 8,     null: false
@@ -721,6 +723,7 @@ ActiveRecord::Schema.define(version: 20160529140120) do
   add_foreign_key "v1_membership", "v1_organization", column: "organization_id", name: "v1_membership_ibfk_9"
   add_foreign_key "v1_membership", "v1_place", column: "place_id", name: "v1_membership_ibfk_8"
   add_foreign_key "v1_membership", "v1_profile", column: "profile_id", name: "v1_membership_ibfk_3"
+  add_foreign_key "v1_membership", "wp_users", column: "user_id", primary_key: "ID", name: "v1_membership_ibfk_10"
   add_foreign_key "v1_membership", "wp_users", column: "accepted_by_id", primary_key: "ID", name: "v1_membership_ibfk_4"
   add_foreign_key "v1_membership", "wp_users", column: "approved_by_id", primary_key: "ID", name: "v1_membership_ibfk_5"
   add_foreign_key "v1_membership", "wp_users", column: "created_by_id", primary_key: "ID", name: "v1_membership_ibfk_1"

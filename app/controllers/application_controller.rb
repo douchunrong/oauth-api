@@ -8,11 +8,13 @@ class ApplicationController < ActionController::Base
   private
 
   def current_user_id
+    return if doorkeeper_token.blank?
+
     doorkeeper_token.resource_owner_id
   end
 
   def current_user
-    return unless doorkeeper_token
+    return if current_user_id.blank?
 
     user_model_class.find(current_user_id)
   rescue => e

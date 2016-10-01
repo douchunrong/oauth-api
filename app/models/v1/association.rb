@@ -23,6 +23,10 @@ module Models
         class_name: 'Models::V1::AssociationLocation',
         inverse_of: :assoc
       }
+      has_many :members, {
+        class_name: 'Models::V1::AssociationMembership',
+        inverse_of: :assoc
+      }
       has_many :organizers, {
         class_name: 'Models::V1::AssociationOrganizer',
         inverse_of: :assoc

@@ -76,11 +76,13 @@ module Controllers
         includes & permittables
       end
 
-      private
+      protected
 
-      def append_title_filter!(query, name)
-        query.where!(id: Models::V1::Profile.with_profile_data(name))
+      def append_list_filters!(query, filters)
+        query.where!(id: Models::V1::Profile.with_profile_data(filters[:name]))
       end
+
+      private
 
       def create_organizers!(resource, organizers_form_data)
         return if organizers_form_data.blank?

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       end
 
       resources :invites, only: RESOURCE_ROUTES
+      resources :anonymous_invites, only: :show # /anonymous_invites/:token
 
       resources :organizations, only: RESOURCE_ROUTES
 
@@ -41,7 +42,9 @@ Rails.application.routes.draw do
 
       resources :sports, only: RESOURCE_ROUTES
 
-      resources :users, only: [:new, :create, :show]
+      resources :users, only: [:new, :create, :show] do
+        resources :invites, only: %i(update destroy), controller: 'user_invites'
+      end
     end
   end
 

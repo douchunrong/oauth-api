@@ -66,6 +66,7 @@ module Models
       # user's can flag one profile as their own
       has_one :profile, primary_key: :ID
       has_many :signatures, inverse_of: :signed_by, primary_key: :ID
+      has_many :memberships, primary_key: :ID
 
       class << self
         def authenticate(email, password)
