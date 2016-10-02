@@ -8,7 +8,6 @@ require_relative 'group'
 
 module Models
   module V1
-    # @todo: Combine v1_location w/v1_resource_location
     class Location < ActiveRecord::Base
       extend Base
 
@@ -18,6 +17,25 @@ module Models
 
       # not positive what this is...
       # has_many :resources, class_name: 'Models::V1::ResourceLocation'
+      geocoded_by :address
+      after_validation :geocode, if: ->(obj) { obj.address.present? && obj.address_changed? }
+
+      attr_accessor :distance, :bearing, :distance_units
+
+      def geocode!(location, units = :mi)
+        self.distance = distance_from(location)
+        self.bearing = location.bearing(self) if location.respond_to?(:bearing)
+        self.distance_units = units
+      end
+
+      def serializable_hash(options = {})
+        options = options.try(:clone) || {}
+
+        options[:methods] = Array(options[:methods])
+        options[:methods] << :distance << :bearing << :distance_units
+
+        super(options)
+      end
     end
 
     class AssociationLocation < Location

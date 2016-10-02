@@ -16,7 +16,14 @@ module Controllers
 
         includes = options[:include] = permittable_list_includes
 
-        render(json: list(params, includes).as_json(options))
+        resources = list(params, includes)
+
+        resources
+          .select { |r| r.respond_to?(:locations) }
+          .flat_map(&:locations)
+          .each { |l| l.geocode!(request.location) }
+
+        render(json: resources.as_json(options))
       end
 
       def create

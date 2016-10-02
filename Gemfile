@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
 gem 'responders', '~> 2.0'
@@ -17,6 +16,8 @@ gem 'mysql2'
 # gem 'therubyracer', platforms: :ruby
 
 gem 'paranoia', '~> 2.0'
+# @todo: get Google Maps API Key
+gem 'geocoder' # https://github.com/alexreisner/geocoder
 
 # WordPress Migration
 # gem 'ruby-wpdb'
