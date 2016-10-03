@@ -10,7 +10,7 @@ module Controllers
 
       protected
 
-      def list(params, includes = nil)
+      def list_resources(params, includes = nil)
         super.tap do |models|
           resources = models.map(&:resource)
 

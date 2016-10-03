@@ -49,7 +49,7 @@ module Controllers
         params.require(:profile_data)
       end
 
-      def list(params, includes = nil)
+      def list_resources(params, includes = nil)
         profile = Models::V1::Profile.find(params[:profile_id])
 
         permission_error!('You may not view this profile') unless profile.readable_by?(current_user)

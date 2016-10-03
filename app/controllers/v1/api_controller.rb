@@ -16,12 +16,15 @@ module Controllers
 
         includes = options[:include] = permittable_list_includes
 
-        resources = list(params, includes)
+        resources = list_resources(params, includes)
 
-        resources
-          .select { |r| r.respond_to?(:locations) }
-          .flat_map(&:locations)
-          .each { |l| l.geocode!(request.location) }
+        # ActiveRecords Serializers?
+        if includes.include?(:locations)
+          resources
+            .select { |r| r.respond_to?(:locations) }
+            .flat_map(&:locations)
+            .each { |l| l.geocode!(request.location) }
+        end
 
         render(json: resources.as_json(options))
       end
@@ -125,10 +128,8 @@ module Controllers
         []
       end
 
-      def list(params, includes = nil)
-        query = params[:admin] == 'true' && current_user.admin? ?
-          self.class.model_class.all :
-          self.class.model_class.accessible_to(current_user)
+      def list_resources(params, includes = nil)
+        query = list_resources_base_query(params, includes)
 
         query.includes(includes) unless includes.nil?
 
@@ -140,6 +141,12 @@ module Controllers
         end
 
         query
+      end
+
+      def list_resources_base_query(params, includes = nil)
+        params[:admin] == 'true' && current_user.admin? ?
+          self.class.model_class.all :
+          self.class.model_class.accessible_to(current_user)
       end
 
       def find(id, includes = nil)

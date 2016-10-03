@@ -7,7 +7,7 @@ module Controllers
     class OrganizerTypesController < ApiController
       self.model_class = Models::V1::OrganizerType
 
-      def list(params, includes = nil)
+      def list_resources(params, includes = nil)
         super
           .tap { |q| q.includes(includes) unless includes.nil? }
           .where(organizer_type: self.class.organizer_class.name)

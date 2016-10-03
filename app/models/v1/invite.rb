@@ -291,7 +291,7 @@ module Models
       def accept(accepted_by_id)
         super
 
-        DivisionMember.create!(
+        DivisionMembership.create!(
           created_by_id: accepted_by_id,
           accepted_by_id: accepted_by_id,
           approved_by_id: created_by_id,
@@ -305,7 +305,7 @@ module Models
       def accept(accepted_by_id)
         super
 
-        GroupMember.create!(
+        GroupMembership.create!(
           created_by_id: accepted_by_id,
           accepted_by_id: accepted_by_id,
           approved_by_id: created_by_id,
@@ -319,7 +319,7 @@ module Models
       def accept(accepted_by_id)
         super
 
-        OrganizationMember.create!(
+        OrganizationMembership.create!(
           created_by_id: accepted_by_id,
           accepted_by_id: accepted_by_id,
           approved_by_id: created_by_id,
@@ -333,7 +333,7 @@ module Models
       def accept(accepted_by_id)
         super
 
-        PlaceMember.create!(
+        PlaceMembership.create!(
           created_by_id: accepted_by_id,
           accepted_by_id: accepted_by_id,
           approved_by_id: created_by_id,

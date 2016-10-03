@@ -39,7 +39,7 @@ module Controllers
         halt(401, e.errors.to_json)
       end
 
-      def list(*)
+      def list_resources(*)
         super.reject { |p| p.user_id == current_user_id }
       end
 

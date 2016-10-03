@@ -4,11 +4,25 @@ require_relative 'user_resources_controller'
 
 module Controllers
   module V1
-    class UserInvitesController < UserResourceController
-      self.model_class = Models::V1::Invite
-      self.resource_param = :invite
+    class UserPlacesController < UserResourceController
+      self.model_class = Models::V1::Place
+      self.resource_param = :place
 
       protected
+
+      def list_resources_base_query(_params, _includes = nil)
+        place_ids = Models::V1::PlaceMembership
+          .select(:place_id)
+          .where(user_id: user_id)
+          .map(&:place_id)
+
+        place_ids |= Models::V1::PlaceOrganizer
+          .select(:place_id)
+          .where(organizer_id: user_id)
+          .map(&:place_id)
+
+        Models::V1::Place.where(id: place_ids)
+      end
 
       def update_resource!(invite, params)
         raise PermissionError, :update unless actable?

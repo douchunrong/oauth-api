@@ -44,6 +44,10 @@ Rails.application.routes.draw do
 
       resources :users, only: [:new, :create, :show] do
         resources :invites, only: %i(update destroy), controller: 'user_invites'
+
+        resources :groups, only: %i(index), controller: 'user_groups'
+
+        resources :places, only: %i(index), controller: 'user_places'
       end
     end
   end
